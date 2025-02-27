@@ -13,4 +13,6 @@ The goal of this comparison is to provide researchers with a comprehensive overv
 | scPoli    | Python   | Trains a reference model and fine-tunes it with query data, focusing on batch correction.         | [Link](https://docs.scarches.org/en/latest/scpoli_surgery_pipeline.html)                              |
 | scGPT     | Python   | Embeds both reference and query data into a foundation model for unified representation.          | [Link](https://github.com/bowang-lab/scGPT/blob/main/tutorials/Tutorial_Reference_Mapping.ipynb)      |
 
+![overview](1.portal_images/transfer_learning-01.jpg)
+
 This repository provides tutorials and code snippets for all the methods mentioned above, showcasing their application in the auto-annotation of query datasets. Additionally, resources are included to help you evaluate and select the most suitable tool for your research needs.
