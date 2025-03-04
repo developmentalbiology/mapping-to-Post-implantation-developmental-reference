@@ -14,6 +14,7 @@ The goal of this comparison is to provide researchers with a comprehensive overv
 | scGPT     | Python   | Embeds both reference and query data into a foundation model for unified representation.          | [Link](https://github.com/bowang-lab/scGPT/blob/main/tutorials/Tutorial_Reference_Mapping.ipynb)      |
 
 ![overview](1.portal_images/transfer_learning-01.jpg)
+
 ![overview](1.portal_images/embryo_model_integration.jpg)
 
 
