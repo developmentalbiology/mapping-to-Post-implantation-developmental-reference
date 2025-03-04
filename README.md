@@ -3,7 +3,7 @@
 Currently, five state-of-the-art methods were compared in this study to evaluate their performance in single-cell data reference mapping. 
 The goal of this comparison is to provide researchers with a comprehensive overview of each method's performance.
 
-## benchmarking transfer learning Methods
+## benchmarking transfer learning methods
 
 | Method    | Language | Mapping Logic                                                                                     | Link                                                                                                   |
 |-----------|----------|---------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------|
