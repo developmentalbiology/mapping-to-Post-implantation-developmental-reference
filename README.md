@@ -15,7 +15,9 @@ The goal of this comparison is to provide researchers with a comprehensive overv
 
 ![overview](1.portal_images/transfer_learning-01.jpg)
 
-# To enhance annotation accuracy, we optimised our training model. The enhanced model provides better predictive performance
+## transferring label with enhanced model
+
+To improve the annotation accuracy, we optimised our training model. The enhanced model provides better predictive performance
 
 ![overview](1.portal_images/enhanced_pred.jpg)
 
