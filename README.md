@@ -3,7 +3,7 @@
 Currently, five state-of-the-art methods were compared in this study to evaluate their performance in single-cell data reference mapping. 
 The goal of this comparison is to provide researchers with a comprehensive overview of each method's performance.
 
-## benchmarking transfer learning Methods
+## benchmarking transfer learning methods
 
 | Method    | Language | Mapping Logic                                                                                     | Link                                                                                                   |
 |-----------|----------|---------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------|
@@ -14,5 +14,8 @@ The goal of this comparison is to provide researchers with a comprehensive overv
 | scGPT     | Python   | Embeds both reference and query data into a foundation model for unified representation.          | [Link](https://github.com/bowang-lab/scGPT/blob/main/tutorials/Tutorial_Reference_Mapping.ipynb)      |
 
 ![overview](1.portal_images/transfer_learning-01.jpg)
+
+![overview](1.portal_images/embryo_model_integration.jpg)
+
 
 This repository provides tutorials and code snippets for all the methods mentioned above, showcasing their application in the auto-annotation of query datasets. Additionally, resources are included to help you evaluate and select the most suitable tool for your research needs.
