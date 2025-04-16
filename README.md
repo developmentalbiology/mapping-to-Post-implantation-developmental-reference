@@ -19,8 +19,5 @@ The goal of this comparison is to provide researchers with a comprehensive overv
 
 To improve the annotation accuracy, we optimised our training model. The enhanced model provides better predictive performance
 
-![overview](1.portal_images/enhanced_pred.jpg)
-
-
 
 This repository provides tutorials and code snippets for all the methods mentioned above, showcasing their application in the auto-annotation of query datasets. Additionally, resources are included to help you evaluate and select the most suitable tool for your research needs.
