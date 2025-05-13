@@ -1,9 +1,7 @@
-## mapping-to-Post-implantation-developmental-reference
-
-Currently, five state-of-the-art methods were compared in this study to evaluate their performance in single-cell data reference mapping. 
-The goal of this comparison is to provide researchers with a comprehensive overview of each method's performance.
-
 ## benchmarking transfer learning methods
+
+five state-of-the-art methods were compared in this study to evaluate their performance in single-cell data reference mapping. 
+The goal of this comparison is to provide researchers with a comprehensive overview of each method's performance.
 
 | Method    | Language | Mapping Logic                                                                                     | Link                                                                                                   |
 |-----------|----------|---------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------|
@@ -13,11 +11,6 @@ The goal of this comparison is to provide researchers with a comprehensive overv
 | scPoli    | Python   | Trains a reference model and fine-tunes it with query data.                                      | [Link](https://docs.scarches.org/en/latest/scpoli_surgery_pipeline.html)                              |
 | scGPT     | Python   | Embeds both reference and query data into a foundation model for unified representation.          | [Link](https://github.com/bowang-lab/scGPT/blob/main/tutorials/Tutorial_Reference_Mapping.ipynb)      |
 
-![overview](1.portal_images/transfer_learning-01.jpg)
-
-## transferring labels with enhanced model
-
-To improve the annotation accuracy, we optimised our training model. The enhanced model provides better predictive performance
-
-
 This repository provides tutorials and code snippets for all the methods mentioned above, showcasing their application in the auto-annotation of query datasets. Additionally, resources are included to help you evaluate and select the most suitable tool for your research needs.
+
+More details and additional content will be disclosed in the near future...
