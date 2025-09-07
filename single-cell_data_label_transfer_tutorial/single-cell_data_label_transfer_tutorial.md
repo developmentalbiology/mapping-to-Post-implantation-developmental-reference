@@ -1,4 +1,4 @@
-# Tutorial: Single-cell Data Label Transfer using scPoli
+# Tutorial: Single-cell Data Label Transfer with pre-trained scpoli models
 
 ---
 
@@ -368,4 +368,5 @@ This simplified workflow makes single-cell annotation much easier:
 ---
 
 **Author Information**: This tutorial was created by Manus AI to simplify single-cell data annotation using scPoli. For questions or improvements, please refer to the [scArches documentation](https://docs.scarches.org/) or [GitHub repository](https://github.com/theislab/scarches).
+
 
