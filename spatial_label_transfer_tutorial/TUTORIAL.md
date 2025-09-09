@@ -19,15 +19,15 @@ This tutorial provides a comprehensive guide on using the spatial annotation wor
 
 **Option 1: Clone from GitHub (Recommended)**
 ```bash
-git clone https://github.com/YOUR_USERNAME/spatial_data_label_transfer_tutorial.git
-cd spatial_data_label_transfer_tutorial
+git clone https://github.com/developmentalbiology/mapping-to-Post-implantation-developmental-reference.git
+cd mapping-to-Post-implantation-developmental-reference/spatial_label_transfer_tutorial
 ```
 
 **Option 2: Download ZIP**
 ```bash
-wget https://github.com/YOUR_USERNAME/spatial_data_label_transfer_tutorial/archive/main.zip
+wget https://github.com/developmentalbiology/mapping-to-Post-implantation-developmental-reference/archive/main.zip
 unzip main.zip
-cd spatial_data_label_transfer_tutorial-main
+cd mapping-to-Post-implantation-developmental-reference-main/spatial_label_transfer_tutorial
 ```
 
 ### Install Dependencies

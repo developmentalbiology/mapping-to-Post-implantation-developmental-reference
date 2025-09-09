@@ -92,8 +92,8 @@ Both tutorials share these core packages:
 ### 2. Installation
 ```bash
 # Clone the repository
-git clone https://github.com/developmentalbiology/spatial_data_label_transfer_tutorial.git
-cd spatial_data_label_transfer_tutorial
+git clone https://github.com/developmentalbiology/mapping-to-Post-implantation-developmental-reference.git
+cd mapping-to-Post-implantation-developmental-reference
 
 # Choose your tutorial directory
 cd single-cell_data_label_transfer_tutorial/  # OR

@@ -8,16 +8,16 @@ This tutorial provides a complete workflow for refining spatial transcriptomics 
 
 ### Option 1: Clone from GitHub
 ```bash
-git clone https://github.com/developmentalbiology/spatial_data_label_transfer_tutorial.git
-cd spatial_data_label_transfer_tutorial
+git clone https://github.com/developmentalbiology/mapping-to-Post-implantation-developmental-reference.git
+cd mapping-to-Post-implantation-developmental-reference/spatial_label_transfer_tutorial
 ```
 
 ### Option 2: Download ZIP
 ```bash
 # Download and extract the repository
-wget https://github.com/developmentalbiology/spatial_data_label_transfer_tutorial/archive/main.zip
+wget https://github.com/developmentalbiology/mapping-to-Post-implantation-developmental-reference/archive/main.zip
 unzip main.zip
-cd spatial_data_label_transfer_tutorial-main
+cd mapping-to-Post-implantation-developmental-reference-main/spatial_label_transfer_tutorial
 ```
 
 ### Install Dependencies
@@ -104,8 +104,8 @@ spatial_label_transfer_tutorial/
 ### Human CS8 Embryo Analysis (Reproducible Example)
 ```bash
 # Download example data first:
-# Human CS8 spatial data: https://drive.google.com/file/d/1VoQqgAsqxF3mXwl_HsbbAu64Jp-duXwh/view?usp=sharing
-# Human reference data: https://drive.google.com/file/d/1lhVc_tZCgXcWecW8aV7iINdDz696_r7r/view?usp=sharing
+# Human CS8 spatial data: https://drive.google.com/file/d/1VoQqgAsqxF3mXwl_HsbbAu64Jp-duXwh/view?usp=drive_link
+# Human reference data: https://drive.google.com/file/d/1lhVc_tZCgXcWecW8aV7iINdDz696_r7r/view?usp=drive_link
 
 ./examples/human_embryo_example.sh  # Reproduces human CS8 analysis exactly
 ```
