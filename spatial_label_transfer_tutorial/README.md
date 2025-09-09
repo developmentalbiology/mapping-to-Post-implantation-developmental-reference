@@ -2,20 +2,20 @@
 
 **Advanced spatial annotation using a 5-tier assignment algorithm for spatial transcriptomics data**
 
-This tutorial provides a complete workflow for refining spatial transcriptomics cell type annotations using RCTD (Robust Cell Type Decomposition) weight scores and a sophisticated multi-tier assignment algorithm.
+This tutorial provides a complete workflow for refining spatial transcriptomics cell type annotations using RCTD (Robust Cell Type Decomposition) weight scores and a multi-tier assignment algorithm.
 
 ## Installation
 
 ### Option 1: Clone from GitHub
 ```bash
-git clone https://github.com/YOUR_USERNAME/spatial_data_label_transfer_tutorial.git
+git clone https://github.com/developmentalbiology/spatial_data_label_transfer_tutorial.git
 cd spatial_data_label_transfer_tutorial
 ```
 
 ### Option 2: Download ZIP
 ```bash
 # Download and extract the repository
-wget https://github.com/YOUR_USERNAME/spatial_data_label_transfer_tutorial/archive/main.zip
+wget https://github.com/developmentalbiology/spatial_data_label_transfer_tutorial/archive/main.zip
 unzip main.zip
 cd spatial_data_label_transfer_tutorial-main
 ```
@@ -56,12 +56,12 @@ pip install -r requirements.txt
 
 ## Workflow Overview
 
-![Workflow Diagram](docs/workflow_diagram_v2.png)
-
 The workflow operates in three main steps:
 1. **Generate RCTD Weight Scores** - Initial cell type likelihood scores for each location
 2. **Analyze Weight Patterns** - Examine weight distributions to guide parameter selection  
 3. **Apply Refined Assignment** - Use multi-tier algorithm with optimized parameters
+
+*Note: See [workflow_diagram_v2.puml](docs/workflow_diagram_v2.puml) for the detailed workflow diagram source.*
 
 ## Directory Structure
 
@@ -88,8 +88,8 @@ spatial_label_transfer_tutorial/
 │   ├── basic_example.sh
 │   └── human_embryo_example.sh   # Human CS8 embryo analysis example
 ├── docs/                        # Additional documentation
-│   ├── workflow_diagram_v2.png
-│   └── methodology.md
+│   ├── TUTORIAL.md              # Detailed methodology guide
+│   └── workflow_diagram_v2.puml # Workflow diagram source
 ├── data/                        # Data directory (see data/README.md)
 └── output/                      # Output directory
 ```
@@ -127,8 +127,9 @@ If you need to convert H5AD files or run RCTD analysis first, see:
 
 ## Documentation
 
-- **[TUTORIAL.md](TUTORIAL.md)** - Comprehensive guide with weight score analysis and parameter optimization
-- **[docs/methodology.md](docs/methodology.md)** - Technical details of the 5-tier assignment algorithm
+- **[TUTORIAL.md](TUTORIAL.md)** - Complete step-by-step tutorial with installation and usage
+- **[docs/TUTORIAL.md](docs/TUTORIAL.md)** - Detailed methodology guide and technical details  
+- **[data/README.md](data/README.md)** - Data acquisition and preparation instructions
 
 ## Output Files
 
@@ -140,17 +141,3 @@ The workflow generates:
   - Individual cell type weight plots  
   - Summary statistics and distributions
   - Confidence score visualizations
-
-## Citation
-
-If you use this workflow, please cite:
-- The original RCTD method: [Cable et al. 2022, Nature Biotechnology](https://www.nature.com/articles/s41587-021-00830-w)
-- This workflow: [Your publication details]
-
-## Contributing
-
-Contributions welcome! Please open an issue to discuss changes or new features.
-
-## License
-
-MIT License - see [LICENSE](LICENSE) file for details.
