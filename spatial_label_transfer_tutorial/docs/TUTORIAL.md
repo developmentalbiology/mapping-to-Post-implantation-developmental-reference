@@ -120,7 +120,7 @@ We provide a pre-processed human reference dataset optimized for embryonic and d
 wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate 'https://docs.google.com/uc?export=download&id=1lhVc_tZCgXcWecW8aV7iINdDz696_r7r' -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=1lhVc_tZCgXcWecW8aV7iINdDz696_r7r" -O human_ref.rds && rm -rf /tmp/cookies.txt
 
 # Method 2: Manual download
-# Visit: https://drive.google.com/file/d/1lhVc_tZCgXcWecW8aV7iINdDz696_r7r/view?usp=sharing
+# Visit: https://drive.google.com/file/d/1lhVc_tZCgXcWecW8aV7iINdDz696_r7r/view?usp=drive_link
 # Download and save as human_ref.rds
 ```
 

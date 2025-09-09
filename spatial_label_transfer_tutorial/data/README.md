@@ -34,13 +34,13 @@ The provided `config/human_CS8_spatial.yaml` contains the exact parameters used 
 wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate 'https://docs.google.com/uc?export=download&id=1VoQqgAsqxF3mXwl_HsbbAu64Jp-duXwh' -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=1VoQqgAsqxF3mXwl_HsbbAu64Jp-duXwh" -O cs8_human_embryo.rds && rm -rf /tmp/cookies.txt
 
 # Or download manually from:
-# https://drive.google.com/file/d/1VoQqgAsqxF3mXwl_HsbbAu64Jp-duXwh/view?usp=sharing
+# https://drive.google.com/file/d/1VoQqgAsqxF3mXwl_HsbbAu64Jp-duXwh/view?usp=drive_link
 
 # Download human reference data  
 wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate 'https://docs.google.com/uc?export=download&id=1lhVc_tZCgXcWecW8aV7iINdDz696_r7r' -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=1lhVc_tZCgXcWecW8aV7iINdDz696_r7r" -O human_ref.rds && rm -rf /tmp/cookies.txt
 
 # Or download manually from:
-# https://drive.google.com/file/d/1lhVc_tZCgXcWecW8aV7iINdDz696_r7r/view?usp=sharing
+# https://drive.google.com/file/d/1lhVc_tZCgXcWecW8aV7iINdDz696_r7r/view?usp=drive_link
 ```
 
 After downloading both files, you can run the complete workflow:
@@ -63,7 +63,7 @@ Rscript ../scripts/utils/run_rctd_with_human_ref.R \
 wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate 'https://docs.google.com/uc?export=download&id=1lhVc_tZCgXcWecW8aV7iINdDz696_r7r' -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=1lhVc_tZCgXcWecW8aV7iINdDz696_r7r" -O human_ref.rds && rm -rf /tmp/cookies.txt
 
 # Or download manually from:
-# https://drive.google.com/file/d/1lhVc_tZCgXcWecW8aV7iINdDz696_r7r/view?usp=sharing
+# https://drive.google.com/file/d/1lhVc_tZCgXcWecW8aV7iINdDz696_r7r/view?usp=drive_link
 ```
 
 ### Option 2: Use Your Own Data

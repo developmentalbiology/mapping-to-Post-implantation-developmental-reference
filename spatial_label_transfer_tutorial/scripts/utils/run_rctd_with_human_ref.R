@@ -49,7 +49,7 @@ run_rctd_with_human_ref <- function(human_ref_path,
   cat("Loading human reference data...\n")
   if (!file.exists(human_ref_path)) {
     stop("Human reference file does not exist: ", human_ref_path, "\n",
-         "Please download from: https://drive.google.com/file/d/1lhVc_tZCgXcWecW8aV7iINdDz696_r7r/view?usp=sharing")
+         "Please download from: https://drive.google.com/file/d/1lhVc_tZCgXcWecW8aV7iINdDz696_r7r/view?usp=drive_link")
   }
   
   human_ref <- readRDS(human_ref_path)
