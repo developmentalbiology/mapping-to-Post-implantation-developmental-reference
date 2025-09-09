@@ -5,6 +5,9 @@
 # This script installs all the required R packages for the workflow.
 # Run this script before using the workflow for the first time.
 
+# Set CRAN mirror
+options(repos = c(CRAN = "https://cloud.r-project.org/"))
+
 cat("Installing R packages for Spatial Annotation Workflow...\n")
 
 # List of required packages
