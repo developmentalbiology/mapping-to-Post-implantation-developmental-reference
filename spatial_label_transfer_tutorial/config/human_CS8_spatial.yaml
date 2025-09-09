@@ -1,0 +1,76 @@
+# Configuration for Human CS8 Embryo Spatial Annotation
+# 
+# This configuration reproduces the exact parameters from the original 
+# human CS8 spatial transcriptomics analysis for consistent results
+
+# Step 1: Multi-Tier Assignment Parameters
+annotation:
+  # Exclude trophoblast and extraembryonic cell types
+  excluded_cell_types: 
+    - "TE"
+    - "CTB_1"
+    - "CTB_2" 
+    - "STB_1"
+    - "STB_2"
+    - "STB_3"
+    - "EVT_1"
+    - "EVT_2"
+    - "Hypoblast_1"
+  
+  # No protected cell types for this analysis
+  protected_cell_types: null
+  
+  # Stricter proportion limit for embryo data
+  max_proportion: 0.1
+  min_proportion: 0.01
+  proportion_correction: true
+  correction_method: "iterative"
+  
+  # Spatial consensus parameters - higher values for embryo data
+  k_neighbors: 7
+  spatial_weight: 0.8
+  
+  # Protection thresholds
+  protection_threshold: 0.4
+  dominance_threshold: 0.2
+  enable_tier0_protection: true
+  
+  # Signal balancing for embryo-specific issues
+  suppressed_cell_types:
+    - "Epiblast_3"
+    - "Neural.ectoderm.forebrain"
+    - "Neural.ectoderm.midbrain"
+  max_suppressed_proportion: 0.1
+  suppression_strength: 0.8
+  
+  # Protect weak signal cell types common in embryo data
+  weak_signal_protected_types:
+    - "Ectoderm"
+    - "Paraxial.mesoderm"
+    - "Lateral.plate.mesoderm_2"
+    - "Primitive.streak"
+    - "DE"
+    - "YS.mesoderm_2"
+    - "YS.endoderm"
+    - "Primitive.megakaryocyte"
+  weak_signal_threshold: 0.02
+  weak_signal_dominance_threshold: 1.01
+  weak_signal_spatial_boost: 3.0
+  
+  # Enable all advanced features
+  enable_signal_balancing: true
+  enable_optimizations: true
+  verbose: true
+
+# Step 2: Visualization Parameters
+plots:
+  color_palette: "Set3"
+  point_size: 0.3  # Smaller points for dense embryo data
+  show_legend: true
+  plot_title_size: 16
+  axis_text_size: 12
+  legend_text_size: 10
+  plot_width: 14
+  plot_height: 10
+  plot_dpi: 300
+

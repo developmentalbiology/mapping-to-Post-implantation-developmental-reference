@@ -1,0 +1,76 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# R files
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+*.Rproj
+.Rprofile
+
+# Data files (too large for GitHub)
+*.rds
+*.h5ad
+*.h5
+*.hdf5
+
+# Output files
+output/
+results/
+final_results/
+plots/
+*.pdf
+*.png
+*.jpg
+*.jpeg
+
+# Temporary files
+*.tmp
+*.log
+*~
+*.swp
+*.swo
+
+# System files
+.DS_Store
+Thumbs.db
+*.lnk
+
+# IDE files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Environment files
+.env
+.venv
+env/
+venv/
+
+# Documentation build
+docs/_build/
+docs/build/
+
+# Node modules (if using any JS tools)
+node_modules/
+
+# Backup files
+*.bak
+*.backup
+
+# Large files that should be downloaded separately
+human_ref.rds
+cs8_human_embryo.rds
+RCTD_*.rds
+
+# Specific output directories that will be created at runtime
+/output/
+/data/*.rds
+/data/*.h5ad

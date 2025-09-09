@@ -1,0 +1,54 @@
+# Default Configuration for Spatial Annotation Workflow
+# 
+# This file contains the default parameters for the multi-tier assignment algorithm
+# and visualization settings. You can modify these parameters to suit your specific 
+# dataset and requirements.
+
+# Step 1: Multi-Tier Assignment Parameters
+annotation:
+  # Basic exclusion and protection
+  excluded_cell_types: null  # e.g., ["Doublet", "Unknown"]
+  protected_cell_types: null  # e.g., ["Neural_crest", "Rare_cell_type"]
+  
+  # Proportion control
+  max_proportion: 0.6  # Maximum proportion for any cell type
+  min_proportion: 0.01  # Minimum proportion threshold
+  proportion_correction: true
+  correction_method: "iterative"
+  
+  # Spatial consensus parameters
+  k_neighbors: 5  # Number of neighbors for spatial consensus
+  spatial_weight: 0.6  # Weight of spatial information (0-1)
+  
+  # Tier 0 protection parameters
+  protection_threshold: 0.2  # Minimum weight to protect cell types
+  dominance_threshold: 1.2  # Minimum dominance ratio for protection
+  enable_tier0_protection: true
+  
+  # Signal balancing parameters
+  suppressed_cell_types: null  # e.g., ["Over_assigned_type"]
+  max_suppressed_proportion: 0.25  # Max proportion for suppressed types
+  suppression_strength: 0.8  # Factor to reduce suppressed type weights
+  
+  weak_signal_protected_types: null  # e.g., ["Weak_signal_type"]
+  weak_signal_threshold: 0.08  # Lower threshold for weak signals
+  weak_signal_dominance_threshold: 1.05  # Lower dominance for weak signals
+  weak_signal_spatial_boost: 1.2  # Spatial weight boost for weak signals
+  
+  # Control parameters
+  enable_signal_balancing: true
+  enable_optimizations: true
+  verbose: true
+
+# Step 2: Visualization Parameters
+plots:
+  color_palette: "Set3"  # Color palette for plots
+  point_size: 0.5  # Size of points in spatial plots
+  show_legend: true  # Whether to show legends
+  plot_title_size: 14  # Title font size
+  axis_text_size: 10  # Axis text font size
+  legend_text_size: 8  # Legend text font size
+  plot_width: 12  # Plot width in inches
+  plot_height: 8  # Plot height in inches
+  plot_dpi: 300  # Plot resolution
+

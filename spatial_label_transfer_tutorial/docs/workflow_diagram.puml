@@ -1,0 +1,39 @@
+@startuml
+!theme vibrant
+
+start
+
+partition "Step 1: Export H5AD Data" {
+  :Input: `reference.h5ad`;
+  :Action: Run `step1_export_h5ad.py`;
+  :Output: `matrix.mtx`, `barcodes.tsv`, `features.tsv`, `obs_metadata.csv`, `umap_coordinates.csv`;
+}
+
+partition "Step 2: Convert to RDS" {
+  :Input: Exported data from Step 1;
+  :Action: Run `step2_h5ad_to_rds.R`;
+  :Output: `reference.rds`;
+}
+
+partition "Step 3: Run RCTD" {
+  :Input: `reference.rds`, `spatial.rds`;
+  :Action: Run `step3_run_rctd.R`;
+  :Output: `rctd_results.rds`;
+}
+
+partition "Step 4: Apply Annotation" {
+  :Input: `rctd_results.rds`, `spatial.rds`;
+  :Action: Run `step4_apply_annotation.R`;
+  :Output: `annotated_spatial.rds`;
+}
+
+partition "Step 5: Export Plots" {
+  :Input: `annotated_spatial.rds`, `rctd_results.rds`;
+  :Action: Run `step5_export_plots.R`;
+  :Output: Plots and summary statistics;
+}
+
+stop
+
+@enduml
+

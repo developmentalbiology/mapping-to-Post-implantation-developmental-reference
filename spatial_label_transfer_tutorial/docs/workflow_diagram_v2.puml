@@ -1,0 +1,22 @@
+@startuml
+!theme vibrant
+
+start
+
+:Input: `rctd_results.rds`, `spatial_data.rds`;
+
+partition "Step 1: Apply Multi-Tier Annotation" {
+  :Action: Run `step1_apply_annotation.R`;
+  :Output: `annotated_spatial.rds`;
+}
+
+partition "Step 2: Generate Visualizations" {
+  :Input: `annotated_spatial.rds`, `rctd_results.rds`;
+  :Action: Run `step2_export_plots.R`;
+  :Output: Plots and summary statistics;
+}
+
+stop
+
+@enduml
+
