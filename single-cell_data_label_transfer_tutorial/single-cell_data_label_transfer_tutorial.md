@@ -145,7 +145,7 @@ First, you need to obtain the `label_transfer_integrated.py` script:
 The script requires pre-trained scPoli models and corresponding reference AnnData files (`adata.h5ad`). These files are packaged together in the same directory.
 
 1. **Access model download link**: 
-   [https://drive.google.com/drive/folders/1KN0O4onIs4Q3IIPHyuFhEsVnG8eBR02b?usp=drive_link](https://drive.google.com/drive/folders/1KN0O4onIs4Q3IIPHyuFhEsVnG8eBR02b?usp=drive_link)
+   [https://drive.google.com/file/d/1rsNPoOKvBn8tOLM8Pr3yxUltp7AxT-GQ/view?usp=drive_link](https://drive.google.com/file/d/1rsNPoOKvBn8tOLM8Pr3yxUltp7AxT-GQ/view?usp=drive_link)
 
 2. **Download model folders**: You will see two folders corresponding to two model types:
    - `enhanced_reference_model_lineage_2ndround`: For **lineage** annotation
