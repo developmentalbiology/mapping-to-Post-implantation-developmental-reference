@@ -1,17 +1,17 @@
 # Label Transfer Tutorials for Developmental Biology
 
-**Comprehensive computational workflows for cell type annotation in developmental biology research**
+**Advanced computational workflows for cell type annotation in developmental biology research**
 
-This repository provides two complementary tutorials for advanced cell type annotation and label transfer methods, specifically designed for developmental biology applications including embryonic and post-implantation developmental studies.
+This repository provides two complementary tutorials for cutting-edge cell type annotation and label transfer methods, specifically developed and optimized for developmental biology applications including embryonic and post-implantation developmental studies.
 
 ## 🧬 Repository Overview
 
-### Available Tutorials
+### Our Methods
 
-| Tutorial | Data Type | Description | Key Features |
-|----------|-----------|-------------|--------------|
-| [**Single-Cell Label Transfer**](single-cell_data_label_transfer_tutorial/) | Single-cell RNA-seq | Advanced methods for single-cell data analysis and cell type annotation | Multi-reference integration, batch correction, confidence scoring |
-| [**Spatial Label Transfer**](spatial_label_transfer_tutorial/) | Spatial transcriptomics | 5-tier assignment algorithm for spatial transcriptomics annotation | RCTD-based refinement, spatial consensus, weight optimization |
+| Tutorial | Data Type | Description | Key Innovations |
+|----------|-----------|-------------|-----------------|
+| [**Single-Cell Label Transfer**](single-cell_data_label_transfer_tutorial/) | Single-cell RNA-seq | Advanced methods for single-cell data analysis and cell type annotation | Multi-reference integration, robust batch correction, confidence scoring |
+| [**Spatial Label Transfer**](spatial_label_transfer_tutorial/) | Spatial transcriptomics | Novel 5-tier assignment algorithm for spatial transcriptomics annotation | RCTD-based refinement, spatial consensus, optimized weight scoring |
 
 ## 🚀 Quick Start
 
@@ -30,20 +30,6 @@ cd spatial_label_transfer_tutorial/
 ./install_r_packages.R
 ./examples/human_embryo_example.sh  # Reproduce published results
 ```
-
-## 📊 Method Benchmarking & Comparison
-
-This repository also includes a comprehensive benchmarking study comparing five state-of-the-art methods for single-cell reference mapping:
-
-| Method    | Language | Mapping Logic                                                                                     | Link                                                                                                   |
-|-----------|----------|---------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------|
-| MapQuery  | R        | Finds anchors between reference and query data to align datasets.                                | [Link](https://satijalab.org/seurat/articles/integration_mapping)                                     |
-| Garfield  | Python   | Builds a reference graph and maps query data by leveraging neighborhood relationships.           | [Link](https://garfield-bio.readthedocs.io/en/latest/?badge=latest)                                   |
-| scArches  | Python   | Trains a reference model and fine-tunes it with query data.                                      | [Link](https://docs.scarches.org/en/latest/scanvi_surgery_pipeline.html)                              |
-| scPoli    | Python   | Trains a reference model and fine-tunes it with query data.                                      | [Link](https://docs.scarches.org/en/latest/scpoli_surgery_pipeline.html)                              |
-| scGPT     | Python   | Embeds both reference and query data into a foundation model for unified representation.          | [Link](https://github.com/bowang-lab/scGPT/blob/main/tutorials/Tutorial_Reference_Mapping.ipynb)      |
-
-The goal of this comparison is to provide researchers with a comprehensive overview of each method's performance and help select the most suitable tool for their research needs.
 
 ## 🔬 Applications in Developmental Biology
 
