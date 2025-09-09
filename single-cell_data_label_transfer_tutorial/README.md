@@ -134,7 +134,7 @@ Before running label transfer, you need to download the script, pre-trained mode
 
 First, you need to obtain the `label_transfer_integrated.py` script:
 
-1. **Download the script**: Save the `label_transfer_integrated.py` file to your project directory
+1. **Download the script**: [label_transfer_integrated.py](label_transfer_integrated.py) - Save this file to your project directory
 2. **Make it executable** (optional on Linux/Mac):
    ```bash
    chmod +x label_transfer_integrated.py
