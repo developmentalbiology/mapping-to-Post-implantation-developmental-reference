@@ -319,76 +319,6 @@ def validate_model_directory(model_dir):
     return True
 
 
-def load_model(model_dir, adata_path, model_type):
-    """
-    Load scPoli model and reference dataset
-    
-    Parameters:
-    - model_dir: Directory containing pre-trained scPoli model and reference data
-    - adata_path: Path to reference AnnData file (can be None for auto-detection)
-    - model_type: Model type ("lineage" or "cell_type")
-    
-    Returns:
-    - source_adata: Reference AnnData object
-    - enhanced_scpoli_model: Loaded scPoli model
-    - cell_type_key: Key name for cell type annotations
-    """
-    try:
-        print(f"=== Loading {model_type} Model ===")
-        
-        # Check GPU availability
-        device = 'cuda' if torch.cuda.is_available() else 'cpu'
-        print(f"Using device: {device}")
-        
-        # Validate model directory
-        if not validate_model_directory(model_dir):
-            return None, None, None
-        
-        # Determine reference data path
-        if adata_path is None or not os.path.exists(adata_path):
-            adata_path = os.path.join(model_dir, "adata.h5ad")
-            print(f"Using reference data from model directory: {adata_path}")
-        
-        # Load reference dataset
-        if not os.path.exists(adata_path):
-            raise FileNotFoundError(f"Reference AnnData file not found: {adata_path}")
-        
-        print("Loading reference dataset...")
-        source_adata = sc.read_h5ad(adata_path)
-        print(f"Reference dataset loaded successfully: {source_adata.shape}")
-        
-        # Ensure observation names are unique
-        if not source_adata.obs_names.is_unique:
-            print("Observation names are not unique, fixing...")
-            source_adata.obs_names_make_unique()
-        
-        # Construct model file path
-        model_file_name = "model_params.pt"
-        model_path = os.path.join(model_dir, model_file_name)
-        if not os.path.exists(model_path):
-            raise FileNotFoundError(f"Model file not found: {model_path}")
-        
-        # Load scPoli model
-        print("Loading scPoli model...")
-        map_location = torch.device(device)
-        enhanced_scpoli_model = scPoli.load(model_dir, adata=source_adata, map_location=map_location)
-        
-        # Set cell type key based on model type
-        if model_type == "lineage":
-            cell_type_key = "lineage"
-        elif model_type == "cell_type":
-            cell_type_key = "reanno"
-        else:
-            raise ValueError(f"Unsupported model type: {model_type}")
-        
-        print(f"✅ {model_type.capitalize()} model loaded successfully")
-        return source_adata, enhanced_scpoli_model, cell_type_key
-    
-    except Exception as e:
-        print(f"❌ Model loading failed: {e}")
-        return None, None, None
-
-
 def align_genes(query_adata, source_adata):
     """
     Align genes between query and reference datasets
@@ -459,399 +389,368 @@ def create_output_directory(output_dir):
     print(f"Output directory: {output_path.absolute()}")
     return str(output_path)
 
-
-def label_transfer_with_preprocessing(query_file, output_folder, model_type="lineage", 
-                                    custom_model_dir=None, custom_adata_path=None,
-                                    auto_preprocess=True, clustering_resolution=1.0,
-                                    progress_callback=None):
+def load_model(model_dir, adata_path, model_type):
     """
-    Perform label transfer on a .h5ad file with integrated preprocessing
+    Load scPoli model and reference dataset
     
     Parameters:
-    - query_file: Path to query dataset (.h5ad file)
-    - output_folder: Path to save output figures and files
-    - model_type: Model type to use ("lineage" or "cell_type")
-    - custom_model_dir: Optional custom model directory path
-    - custom_adata_path: Optional custom reference dataset path
-    - auto_preprocess: Whether to automatically preprocess raw data
-    - clustering_resolution: Resolution for Leiden clustering during preprocessing
-    - progress_callback: Optional progress callback function
+    - model_dir: Directory containing pre-trained scPoli model and reference data
+    - adata_path: Path to reference AnnData file (can be None for auto-detection)
+    - model_type: Model type ("lineage" or "cell_type")
     
     Returns:
-    - Result summary
+    - source_adata: Reference AnnData object
+    - enhanced_scpoli_model: Loaded scPoli model
+    - cell_type_key: Key name for cell type annotations
     """
-    
-    print("\n" + "="*60)
-    print(f"Starting Label Transfer with Integrated Preprocessing")
-    print(f"Query file: {query_file}")
-    print(f"Model type: {model_type}")
-    print(f"Auto preprocess: {auto_preprocess}")
-    print("="*60)
-    
-    # Check runtime environment
-    check_prerequisites()
-    
-    # Create output directory
-    output_folder = create_output_directory(output_folder)
-    
-    # Load query dataset
     try:
-        query_adata = sc.read_h5ad(query_file)
-        file_name = os.path.basename(query_file)
-        print(f"\nLoaded file: {file_name}")
-        print(f"Query data shape: {query_adata.shape}")
-    except FileNotFoundError:
-        raise FileNotFoundError(f"File not found: {query_file}")
-    
-    # Update progress
-    if progress_callback:
-        progress_callback.status_text.text("Query dataset loaded. Checking preprocessing...")
-        progress_callback.progress_bar.progress(0.1)
-    
-    # Check if data needs preprocessing
-    if check_preprocessing(query_adata):
-        print("Data is already preprocessed, proceeding with label transfer...")
-        processed_adata = query_adata
-    elif auto_preprocess:
-        # Check if we have raw count data
-        if not check_raw_data(query_adata):
-            raise ValueError("Data doesn't appear to be raw counts and auto-preprocessing is enabled")
+        print(f"=== Loading {model_type} Model ===")
         
-        # Update progress
-        if progress_callback:
-            progress_callback.status_text.text("Preprocessing raw data...")
-            progress_callback.progress_bar.progress(0.2)
+        # Check GPU availability
+        device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        print(f"Using device: {device}")
         
-        # Perform preprocessing
-        processed_adata = preprocess_data(
-            query_adata, 
-            resolution=clustering_resolution,
-            output_dir=output_folder
-        )
+        # Validate model directory
+        if not validate_model_directory(model_dir):
+            return None, None, None
         
-        # Save preprocessed data
-        preprocessed_file = os.path.join(output_folder, f"{os.path.splitext(file_name)[0]}_preprocessed.h5ad")
-        processed_adata.write_h5ad(preprocessed_file)
-        print(f"Preprocessed data saved to: {preprocessed_file}")
-    else:
-        raise ValueError("Data is not preprocessed and auto-preprocessing is disabled")
-    
-    # Define model directories and paths
-    if custom_model_dir and custom_adata_path:
-        model_dir = custom_model_dir
-        adata_path = custom_adata_path
-        print(f"Using custom model directory: {model_dir}")
-        print(f"Using custom reference dataset: {adata_path}")
-    else:
-        # Use default paths
+        # Determine reference data path
+        if adata_path is None or not os.path.exists(adata_path):
+            adata_path = os.path.join(model_dir, "adata.h5ad")
+            print(f"Using reference data from model directory: {adata_path}")
+        
+        # Load reference dataset
+        if not os.path.exists(adata_path):
+            raise FileNotFoundError(f"Reference AnnData file not found: {adata_path}")
+        
+        print("Loading reference dataset...")
+        source_adata = sc.read_h5ad(adata_path)
+        print(f"Reference dataset loaded successfully: {source_adata.shape}")
+        
+        # Ensure observation names are unique
+        if not source_adata.obs_names.is_unique:
+            print("Observation names are not unique, fixing...")
+            source_adata.obs_names_make_unique()
+        
+        # Construct model file path
+        model_file_name = "model_params.pt"
+        model_path = os.path.join(model_dir, model_file_name)
+        if not os.path.exists(model_path):
+            raise FileNotFoundError(f"Model file not found: {model_path}")
+        
+        # Load scPoli model
+        print("Loading scPoli model...")
+        map_location = torch.device(device)
+        enhanced_scpoli_model = scPoli.load(model_dir, adata=source_adata, map_location=map_location)
+        
+        # Set cell type key based on model type
         if model_type == "lineage":
-            model_dir = './models/enhanced_reference_model_lineage_2ndround/'
+            cell_type_key = "lineage"
         elif model_type == "cell_type":
-            model_dir = './models/enhanced_reference_model_reanno_2ndround/'
+            cell_type_key = "reanno"
         else:
             raise ValueError(f"Unsupported model type: {model_type}")
         
-        adata_path = None  # Will be auto-detected in model directory
-        print(f"Using default {model_type} model directory: {model_dir}")
+        print(f"✅ {model_type.capitalize()} model loaded successfully")
+        return source_adata, enhanced_scpoli_model, cell_type_key
     
-    # Update progress
-    if progress_callback:
-        progress_callback.status_text.text("Loading model and reference dataset...")
-        progress_callback.progress_bar.progress(0.3)
-    
-    # Load model
-    source_adata, enhanced_scpoli_model, cell_type_key = load_model(model_dir, adata_path, model_type)
-    if source_adata is None or enhanced_scpoli_model is None:
-        raise ValueError("Failed to load reference model or dataset")
-    
-    # Update progress
-    if progress_callback:
-        progress_callback.status_text.text("Aligning genes...")
-        progress_callback.progress_bar.progress(0.4)
-    
-    # Align genes
-    query_adata_extended = align_genes(processed_adata, source_adata)
-    query_adata_extended.obs[cell_type_key] = 'Unknown'
-    
-    # Preserve original orig.ident
-    if 'orig.ident' not in query_adata_extended.obs.columns:
-        base_name = os.path.splitext(file_name)[0]
-        query_adata_extended.obs['orig.ident'] = base_name
-    
-    # Update progress
-    if progress_callback:
-        progress_callback.status_text.text("Initializing scPoli model...")
-        progress_callback.progress_bar.progress(0.5)
-    
-    # Perform label transfer
-    print("\n=== Performing Label Transfer ===")
-    print("Initializing scPoli query model...")
-    
-    try:
-        scpoli_query = scPoli.load_query(
-            query_adata_extended,
-            enhanced_scpoli_model,
-            freeze_expression_model=True
-        )
-        
-        # Update progress
-        if progress_callback:
-            progress_callback.status_text.text("Training query model...")
-            progress_callback.progress_bar.progress(0.6)
-        
-        print("Training query model...")
-        scpoli_query.train(
-            n_epochs=50,
-            pretraining_epochs=40,
-            eta=5,
-            alpha_epoch_anneal=100
-        )
-        
-        # Update progress
-        if progress_callback:
-            progress_callback.status_text.text("Generating predictions...")
-            progress_callback.progress_bar.progress(0.7)
-        
-        print("Generating predictions...")
-        preds, uncert = scpoli_query.classify(query_adata_extended, scale_uncertainties=True)
-        
-        print(f"Predictions completed. Prediction count: {len(preds)}")
-        print(f"Uncertainty range: {uncert.min():.3f} - {uncert.max():.3f}")
-        
     except Exception as e:
-        print(f"❌ Error during label transfer process: {e}")
-        raise
-    
-    # Set model to evaluation mode
-    scpoli_query.model.eval()
-    
-    # Get latent representations
-    print("Getting latent representations...")
-    data_latent_source = scpoli_query.get_latent(source_adata, mean=True)
-    adata_latent_source = sc.AnnData(data_latent_source.astype(np.float32))
-    adata_latent_source.obs = source_adata.obs.copy()
-    adata_latent_source.obs['is_original_query'] = False
-    adata_latent_source.obs['original_query_id'] = -1
-    
-    data_latent = scpoli_query.get_latent(query_adata_extended, mean=True)
-    adata_latent = sc.AnnData(data_latent.astype(np.float32))
-    adata_latent.obs = query_adata_extended.obs.copy()
-    
-    adata_latent.obs[f'{cell_type_key}_pred'] = preds.tolist()
-    adata_latent.obs[f'{cell_type_key}_uncert'] = uncert.tolist()
-    adata_latent.obs['classifier_outcome'] = (
-        adata_latent.obs[f'{cell_type_key}_pred'] == adata_latent.obs[cell_type_key]
-    )
-    
-    # Get prototypes
-    labeled_prototypes = scpoli_query.get_prototypes_info()
-    labeled_prototypes.obs['study'] = 'labeled prototype'
-    labeled_prototypes.obs['is_original_query'] = False
-    labeled_prototypes.obs['original_query_id'] = -2
-    
-    unlabeled_prototypes = scpoli_query.get_prototypes_info(prototype_set='unlabeled')
-    unlabeled_prototypes.obs['study'] = 'unlabeled prototype'
-    unlabeled_prototypes.obs['is_original_query'] = False
-    unlabeled_prototypes.obs['original_query_id'] = -3
-    
-    # Update progress
-    if progress_callback:
-        progress_callback.status_text.text("Generating UMAP embeddings...")
-        progress_callback.progress_bar.progress(0.8)
-    
-    # Combine AnnData with prototypes
-    adata_latent_full = adata_latent_source.concatenate(
-        [adata_latent, labeled_prototypes, unlabeled_prototypes],
-        batch_key='query'
-    )
-    
-    print(f"\n=== Post-concatenation Data Analysis ===")
-    print(f"Total data size: {adata_latent_full.n_obs}")
-    
-    # Set predictions to NaN for reference data
-    adata_latent_full.obs[f'{cell_type_key}_pred'][adata_latent_full.obs['query'].isin(['0'])] = np.nan
-    
-    # Compute UMAP and neighbors
-    sc.pp.neighbors(adata_latent_full, n_neighbors=15)
-    sc.tl.umap(adata_latent_full)
-    
-    # Get AnnData without prototypes for cleaner visualization
-    adata_no_prototypes = adata_latent_full[adata_latent_full.obs['query'].isin(['0', '1'])]
-    
-    # Compute UMAP directly on query data
-    print("Computing UMAP directly on query latent data...")
-    sc.pp.neighbors(adata_latent, n_neighbors=15)
-    sc.tl.leiden(adata_latent, resolution=0.5)
-    sc.tl.umap(adata_latent)
-    print(f"✅ Computed UMAP directly on query data: {adata_latent.obsm['X_umap'].shape}")
-    
-    # Update progress
-    if progress_callback:
-        progress_callback.status_text.text("Saving UMAP plots...")
-        progress_callback.progress_bar.progress(0.9)
-    
-    # Plot and save UMAP plots
-    print("\n=== Generating Visualization Charts ===")
-    base_filename = os.path.splitext(file_name)[0]
-    
-    # Generate plots for both full data and query-only data
-    for data_obj, data_name in [(adata_no_prototypes, "full"), (adata_latent, "query")]:
+        print(f"❌ Model loading failed: {e}")
+        return None, None, None
+
+
+def label_transfer_with_preprocessing_dual_model(
+    query_file,
+    output_folder,
+    custom_model_dir_lineage=None,
+    custom_model_dir_celltype=None,
+    custom_adata_path_lineage=None,
+    custom_adata_path_celltype=None,
+    auto_preprocess=True,
+    clustering_resolution=1.0,
+    progress_callback=None
+):
+    """
+    Perform dual-model label transfer using BOTH lineage and cell_type models.
+    For lineage model, uses the UMAP layout from cell_type model for consistent visualization.
+    All results are saved in a single .h5ad file.
+
+    Parameters:
+    - query_file: Path to query dataset (.h5ad file)
+    - output_folder: Output directory
+    - custom_model_dir_lineage: Optional custom lineage model directory
+    - custom_model_dir_celltype: Optional custom cell_type model directory
+    - custom_adata_path_lineage: Optional custom lineage reference adata
+    - custom_adata_path_celltype: Optional custom cell_type reference adata
+    - auto_preprocess: Whether to preprocess raw data
+    - clustering_resolution: Leiden clustering resolution
+    - progress_callback: Optional GUI progress callback
+
+    Returns:
+    - Result summary dict
+    """
+    import os
+    import numpy as np
+    import pandas as pd
+    import scanpy as sc
+    import torch
+    from umap import UMAP
+
+    print("\n" + "="*60)
+    print("Starting Dual-Model Label Transfer with Shared UMAP Layout")
+    print(f"Query file: {query_file}")
+    print("="*60)
+
+    # Check prerequisites
+    check_prerequisites()
+    output_folder = create_output_directory(output_folder)
+
+    # Load query data
+    try:
+        query_adata = sc.read_h5ad(query_file)
+        file_name = os.path.basename(query_file)
+        base_name = os.path.splitext(file_name)[0]
+        print(f"Loaded: {file_name} | Shape: {query_adata.shape}")
+    except FileNotFoundError:
+        raise FileNotFoundError(f"File not found: {query_file}")
+
+    if progress_callback and hasattr(progress_callback, 'status_text'):
+        progress_callback.status_text.text("Query dataset loaded. Checking preprocessing...")
+        if hasattr(progress_callback, 'progress_bar'):
+            progress_callback.progress_bar.progress(0.05)
+
+    # Preprocessing
+    if check_preprocessing(query_adata):
+        print("Data is already preprocessed.")
+        processed_adata = query_adata
+    elif auto_preprocess:
+        if not check_raw_data(query_adata):
+            raise ValueError("Data is not raw counts and auto-preprocessing is enabled")
+        if progress_callback and hasattr(progress_callback, 'status_text'):
+            progress_callback.status_text.text("Preprocessing raw data...")
+            if hasattr(progress_callback, 'progress_bar'):
+                progress_callback.progress_bar.progress(0.1)
+        processed_adata = preprocess_data(
+            query_adata,
+            resolution=clustering_resolution,
+            output_dir=output_folder
+        )
+        preprocessed_file = os.path.join(output_folder, f"{base_name}_preprocessed.h5ad")
+        processed_adata.write_h5ad(preprocessed_file)
+        print(f"Preprocessed data saved: {preprocessed_file}")
+    else:
+        raise ValueError("Data not preprocessed and auto_preprocess=False")
+
+    if 'orig.ident' not in processed_adata.obs:
+        processed_adata.obs['orig.ident'] = base_name
+
+    # Model configurations: cell_type MUST run first
+    model_configs = {
+        "cell_type": {
+            "model_dir": custom_model_dir_celltype or './models/enhanced_reference_model_reanno_2ndround/',
+            "adata_path": custom_adata_path_celltype,
+            "cell_type_key": "reanno"
+        },
+        "lineage": {
+            "model_dir": custom_model_dir_lineage or './models/enhanced_reference_model_lineage_2ndround/',
+            "adata_path": custom_adata_path_lineage,
+            "cell_type_key": "lineage"
+        }
+    }
+
+    all_results = {}
+    shared_umap_coords = None  # 存储共享的UMAP坐标
+
+    for model_name, config in model_configs.items():
+        print(f"\n--- Processing {model_name.upper()} Model ---")
         
-        if f'{cell_type_key}_pred' in data_obj.obs.columns:
-            print(f"  Creating {model_type} prediction UMAP plot - {data_name} data...")
-            
-            # Convert to categorical
-            data_obj.obs[f'{cell_type_key}_pred'] = data_obj.obs[f'{cell_type_key}_pred'].astype('category')
-            
-            sc.pl.umap(
-                data_obj,
-                color=f'{cell_type_key}_pred',
-                show=False,
-                frameon=False
-            )
-            plot_file = os.path.join(output_folder, f"{base_filename}_{data_name}_{cell_type_key}_pred.pdf")
-            plt.savefig(plot_file, dpi=300, bbox_inches='tight')
-            plt.close()
-            print(f"    Saved prediction plot: {plot_file}")
+        # Load model
+        source_adata, enhanced_scpoli_model, cell_type_key = load_model(
+            model_dir=config["model_dir"],
+            adata_path=config["adata_path"],
+            model_type=model_name
+        )
+        if source_adata is None or enhanced_scpoli_model is None:
+            raise ValueError(f"Failed to load {model_name} model")
+
+        # Align genes
+        query_adata_extended = align_genes(processed_adata, source_adata)
+        query_adata_extended.obs[cell_type_key] = 'Unknown'
+        if 'orig.ident' not in query_adata_extended.obs:
+            query_adata_extended.obs['orig.ident'] = base_name
+
+        # Load query model
+        try:
+            scpoli_query = scPoli.load_query_data(query_adata_extended, enhanced_scpoli_model, labeled_indices=[])
+        except Exception as e:
+            print(f"❌ Failed to load query data for {model_name}: {e}")
+            raise
+
+        # Train
+        print(f"Training {model_name} query model...")
+        scpoli_query.train(n_epochs=50, pretraining_epochs=40, eta=10)
+
+        # Predict
+        results = scpoli_query.classify(query_adata_extended, scale_uncertainties=True)
+        preds = results[cell_type_key]['preds']
+        uncert = results[cell_type_key]['uncert']
+
+        # Get latent
+        latent = scpoli_query.get_latent(query_adata_extended, mean=True)
+        adata_latent = sc.AnnData(latent.astype(np.float32))
+        adata_latent.obs = query_adata_extended.obs.copy()
+        adata_latent.obs[f'{cell_type_key}_pred'] = preds.tolist()
+        adata_latent.obs[f'{cell_type_key}_uncert'] = uncert.tolist()
+
+        # --- 关键修改：确保两个模型使用相同的UMAP布局 ---
+        if model_name == "cell_type":
+            # 对于cell_type模型，计算UMAP
+            sc.pp.neighbors(adata_latent)
+            sc.tl.umap(adata_latent)
+            shared_umap_coords = adata_latent.obsm['X_umap'].copy()
+            print(f"✅ Computed UMAP for cell_type: {shared_umap_coords.shape}")
+        else:
+            # 对于lineage模型，使用cell_type的UMAP坐标
+            if shared_umap_coords is not None:
+                adata_latent.obsm['X_umap'] = shared_umap_coords
+                print(f"✅ Using shared UMAP layout for lineage: {shared_umap_coords.shape}")
+            else:
+                # 如果cell_type还没运行，计算默认UMAP
+                sc.pp.neighbors(adata_latent)
+                sc.tl.umap(adata_latent)
+                print(f"⚠️  Computed default UMAP for lineage (cell_type not run yet)")
+
+        # Store result
+        all_results[model_name] = {
+            'adata_latent': adata_latent,
+            'cell_type_key': cell_type_key,
+            'source_adata': source_adata,
+            'scpoli_query': scpoli_query
+        }
+
+    # === Save predictions to processed_adata ===
+    print("\n=== Saving dual-model results to AnnData ===")
     
-    # Generate additional standard plots
-    umap_dataset_file = os.path.join(output_folder, f"{base_filename}_scPoli_{model_type}_dataset.png")
-    umap_uncert_file = os.path.join(output_folder, f"{base_filename}_scPoli_{model_type}_uncert.png")
-    
-    # Plot datasets
-    sc.pl.umap(
-        adata_no_prototypes,
-        color='orig.ident',
-        show=False,
-        frameon=False
-    )
-    plt.savefig(umap_dataset_file, dpi=300, bbox_inches='tight')
-    plt.close()
-    print(f"Saved dataset plot: {umap_dataset_file}")
-    
-    # Plot uncertainty
-    sc.pl.umap(
-        adata_no_prototypes,
-        color=f'{cell_type_key}_uncert',
-        show=False,
-        frameon=False,
-        cmap='magma',
-        vmax=1
-    )
-    plt.savefig(umap_uncert_file, dpi=300, bbox_inches='tight')
-    plt.close()
-    print(f"Saved uncertainty plot: {umap_uncert_file}")
-    
-    # Update progress
-    if progress_callback:
-        progress_callback.status_text.text("Saving results...")
-        progress_callback.progress_bar.progress(0.95)
-    
-    # Extract results and save back to original query data
-    print("\n=== Extracting and Saving Results ===")
-    
-    # Transfer predictions to original query data
-    print("Transferring annotation predictions to original data")
-    matching_indices = adata_latent.obs.index.intersection(processed_adata.obs.index)
-    
-    # Initialize columns
-    if f'{cell_type_key}_pred' not in processed_adata.obs.columns:
-        processed_adata.obs[f'{cell_type_key}_pred'] = np.nan
-    if f'{cell_type_key}_uncert' not in processed_adata.obs.columns:
-        processed_adata.obs[f'{cell_type_key}_uncert'] = np.nan
-    
-    # Transfer results using matching indices
-    processed_adata.obs.loc[matching_indices, f'{cell_type_key}_pred'] = adata_latent.obs.loc[matching_indices, f'{cell_type_key}_pred']
-    processed_adata.obs.loc[matching_indices, f'{cell_type_key}_uncert'] = adata_latent.obs.loc[matching_indices, f'{cell_type_key}_uncert']
-    
-    print(f"Found {len(matching_indices)} matching cell IDs for result transfer")
-    
-    # Store UMAP coordinates
-    print("Storing UMAP coordinates...")
-    processed_adata.obsm[f'X_umap_{cell_type_key}'] = adata_latent.obsm['X_umap']
-    print(f"Added UMAP embeddings to processed_adata.obsm['X_umap_{cell_type_key}']")
-    print(f"UMAP shape: {adata_latent.obsm['X_umap'].shape}")
-    
-    # Clean data for saving
-    print("Cleaning data for saving...")
+    # 确保两个模型都使用相同的UMAP坐标
+    if shared_umap_coords is not None:
+        # 将共享的UMAP坐标保存到主数据对象
+        processed_adata.obsm['X_umap_anno'] = shared_umap_coords
+        
+        for model_name, result in all_results.items():
+            cell_type_key = result['cell_type_key']
+            pred_col = f'{cell_type_key}_pred'
+            uncert_col = f'{cell_type_key}_uncert'
+
+            latent_obs = result['adata_latent'].obs
+            unique_preds = latent_obs[pred_col].dropna().astype(str).unique().tolist()
+            if 'Unknown' in unique_preds:
+                unique_preds.remove('Unknown')
+            all_preds = ['Unknown'] + sorted(unique_preds)
+
+            pred_map = dict(zip(latent_obs.index, latent_obs[pred_col].astype(str)))
+            uncert_map = dict(zip(latent_obs.index, latent_obs[uncert_col]))
+
+            processed_adata.obs[pred_col] = [pred_map.get(idx, 'Unknown') for idx in processed_adata.obs.index]
+            processed_adata.obs[uncert_col] = [uncert_map.get(idx, np.nan) for idx in processed_adata.obs.index]
+
+            # 两个模型都使用相同的UMAP坐标
+            processed_adata.obsm[f'X_umap_{cell_type_key}'] = shared_umap_coords
+            print(f"✅ Saved {pred_col} with shared UMAP layout")
+
+    # Clean dtypes
     for col in processed_adata.obs.columns:
         if col.endswith('_pred'):
             processed_adata.obs[col] = processed_adata.obs[col].astype('category')
-        elif col.endswith('_uncert'):
-            processed_adata.obs[col] = pd.to_numeric(processed_adata.obs[col], errors='coerce')
-    
-    # Save annotated data
-    annotated_file = os.path.join(output_folder, f"{base_filename}_annotated.h5ad")
-    try:
-        processed_adata.write_h5ad(annotated_file)
-        print(f"✅ Annotated data saved: {annotated_file}")
-    except Exception as save_error:
-        print(f"Warning during save: {str(save_error)}")
-        # Try alternative save method
-        try:
-            processed_adata.write(annotated_file)
-            print(f"✅ Annotated data saved (alternative method): {annotated_file}")
-        except Exception as alt_save_error:
-            print(f"❌ Failed to save annotated data: {str(alt_save_error)}")
-    
-    # Generate classification report if sklearn is available
-    if classification_report is not None:
-        try:
-            # Create a simple classification report
-            pred_counts = processed_adata.obs[f'{cell_type_key}_pred'].value_counts()
-            report_file = os.path.join(output_folder, f"{base_filename}_classification_report.txt")
-            
-            with open(report_file, 'w') as f:
-                f.write(f"Classification Report for {model_type} Model\n")
-                f.write("="*50 + "\n")
-                f.write(f"Total cells: {processed_adata.n_obs}\n")
-                f.write(f"Predicted categories: {len(pred_counts)}\n\n")
-                f.write("Prediction counts:\n")
-                for category, count in pred_counts.items():
-                    percentage = (count / processed_adata.n_obs) * 100
-                    f.write(f"  {category}: {count} ({percentage:.1f}%)\n")
-                
-                # Uncertainty statistics
-                uncert_col = f'{cell_type_key}_uncert'
-                if uncert_col in processed_adata.obs.columns:
-                    uncert_values = processed_adata.obs[uncert_col].dropna()
-                    f.write(f"\nUncertainty statistics:\n")
-                    f.write(f"  Mean: {uncert_values.mean():.3f}\n")
-                    f.write(f"  Median: {uncert_values.median():.3f}\n")
-                    f.write(f"  Min: {uncert_values.min():.3f}\n")
-                    f.write(f"  Max: {uncert_values.max():.3f}\n")
-                    f.write(f"  High confidence (< 0.3): {(uncert_values < 0.3).sum()} ({(uncert_values < 0.3).mean()*100:.1f}%)\n")
-            
-            print(f"Classification report saved: {report_file}")
-            
-        except Exception as report_error:
-            print(f"Warning: Could not generate classification report: {str(report_error)}")
-    
-    # Update progress
-    if progress_callback:
+
+    # Save
+    annotated_file = os.path.join(output_folder, f"{base_name}_annotated.h5ad")
+    processed_adata.write_h5ad(annotated_file)
+    print(f"✅ Combined result saved: {annotated_file}")
+
+    # === Plotting ===
+    # 使用共享的UMAP坐标进行绘图
+    lineage_color = {
+        "Amniotic_ecto": "#1f77b4", "Notochord": "#aa40fc", "Endoderm": "#ff7f0e",
+        "PGC": "#8c564b", "ExE_endo": "#279e68", "Primitive.streak": "#e377c2",
+        "NMP": "#d62728", "TE_TrB": "#b5bd61", "epi": "#17becf",
+        "hemogenic": "#aec7e8", "meso_Exe.meso": "#ffbb78", "neural_ecto": "#98df8a"
+    }
+    lineage_ordered = list(lineage_color.keys())
+    reanno_ordered = [
+        'TE', 'CTB_1','CTB_2', 'STB_1', 'STB_2', 'STB_3', 'EVT_1', 'EVT_2',
+        'Epiblast_1','Epiblast_2','Epiblast_3','Ectoderm',
+        'Amniontic.epi','Amniontic.ectoderm', 'PGC', 'Primitive.streak',
+        'Neuromesodermal.progenitor', 'Neural.crest', 'Neural.ectoderm.forebrain',
+        'Neural.ectoderm.hindbrain', 'Neural.ectoderm.midbrain','Spinal.cord',
+        'Paraxial.mesoderm','Emergent.mesoderm','Pre-somatic.mesoderm','Somite',
+        'Rostral.mesoderm', 'Lateral.plate.mesoderm_1', 'Lateral.plate.mesoderm_2',
+        'Lateral.plate.mesoderm_3','Cardiac.mesoderm','Amniotic.mesoderm',
+        'Exe.meso.progenitor','YS.mesoderm_1', 'YS.mesoderm_2', 'Hypoblast_1',
+        'Hypoblast_2', 'AVE', 'VE', 'YS.endoderm', 'DE','Gut', 'Notochord',
+        'Hemogenic.endothelial.progenitor','Endothelium','Erythroid',
+        'Primitive.megakaryocyte','Myeloid.progenitor'
+    ]
+
+    for model_name, result in all_results.items():
+        adata_latent = result['adata_latent']
+        cell_type_key = result['cell_type_key']
+        pred_col = f'{cell_type_key}_pred'
+
+        # 确保使用共享的UMAP坐标
+        adata_latent.obsm['X_umap'] = shared_umap_coords
+
+        adata_latent.obs[pred_col] = adata_latent.obs[pred_col].astype('category')
+
+        if cell_type_key == "lineage":
+            cats = [c for c in lineage_ordered if c in adata_latent.obs[pred_col].cat.categories]
+            cats += [c for c in adata_latent.obs[pred_col].cat.categories if c not in cats]
+            adata_latent.obs[pred_col] = adata_latent.obs[pred_col].cat.reorder_categories(cats)
+            palette = [lineage_color.get(c, "#cccccc") for c in cats]
+            sc.pl.umap(adata_latent, color=pred_col, palette=palette, show=False, frameon=False)
+        else:
+            all_cats = reanno_ordered + [c for c in adata_latent.obs[pred_col].cat.categories if c not in reanno_ordered]
+            adata_latent.obs[pred_col] = adata_latent.obs[pred_col].cat.set_categories(all_cats)
+            sc.pl.umap(adata_latent, color=pred_col, show=False, frameon=False)
+
+        plt.savefig(os.path.join(output_folder, f"{base_name}_{model_name}_prediction.pdf"), dpi=300, bbox_inches='tight')
+        plt.close()
+
+        sc.pl.umap(adata_latent, color=f'{cell_type_key}_uncert', cmap='magma', vmax=1, show=False, frameon=False)
+        plt.savefig(os.path.join(output_folder, f"{base_name}_{model_name}_uncertainty.pdf"), dpi=300, bbox_inches='tight')
+        plt.close()
+
+    # Report
+    report_file = os.path.join(output_folder, f"{base_name}_dual_model_report.txt")
+    with open(report_file, 'w') as f:
+        f.write("Dual-Model Label Transfer Report\n")
+        f.write("="*50 + "\n")
+        f.write(f"Input: {query_file}\n")
+        f.write(f"Cells: {processed_adata.n_obs}\n\n")
+        for name, res in all_results.items():
+            cnt = processed_adata.obs[f"{res['cell_type_key']}_pred"].value_counts()
+            f.write(f"[{name.upper()}]\nTop 5 predictions:\n")
+            for i, (cat, n) in enumerate(cnt.head(5).items()):
+                f.write(f"  {cat}: {n}\n")
+            f.write("\n")
+
+    if progress_callback and hasattr(progress_callback, 'status_text'):
         progress_callback.status_text.text("Task completed!")
-        progress_callback.progress_bar.progress(1.0)
-    
+        if hasattr(progress_callback, 'progress_bar'):
+            progress_callback.progress_bar.progress(1.0)
+
     print("\n" + "="*60)
-    print("✅ Label transfer with preprocessing completed!")
-    print(f"Output directory: {output_folder}")
+    print("✅ Dual-model label transfer with shared UMAP layout completed!")
+    print(f"Results saved to: {output_folder}")
     print("="*60)
-    
-    # Return result summary
-    result_summary = {
+
+    return {
         'input_file': query_file,
         'output_directory': output_folder,
-        'model_type': model_type,
-        'preprocessing_applied': auto_preprocess,
-        'clustering_resolution': clustering_resolution,
         'cell_count': processed_adata.n_obs,
-        'gene_count': processed_adata.n_vars,
         'annotated_file': annotated_file,
-        'prediction_column': f'{cell_type_key}_pred',
-        'uncertainty_column': f'{cell_type_key}_uncert'
+        'prediction_columns': ['lineage_pred', 'reanno_pred'],
+        'umap_keys': ['X_umap_lineage', 'X_umap_reanno']
     }
-    
-    return result_summary
 
 
 def remove_sparsity(adata):
@@ -872,10 +771,10 @@ def main():
     parser = argparse.ArgumentParser(description='Single-cell RNA-seq Data Label Transfer Tool with Integrated Preprocessing')
     parser.add_argument('query_file', help='Query data file path (.h5ad)')
     parser.add_argument('output_folder', help='Output folder path')
-    parser.add_argument('--model_type', choices=['lineage', 'cell_type'], 
-                       default='lineage', help='Model type (default: lineage)')
-    parser.add_argument('--model_dir', help='Custom model directory path')
-    parser.add_argument('--adata_path', help='Custom reference data path')
+    parser.add_argument('--model_dir_lineage', help='Custom model directory path for lineage')
+    parser.add_argument('--model_dir_celltype', help='Custom model directory path for celltype')
+    parser.add_argument('--adata_path_lineage', help='Custom reference data path for lineage')
+    parser.add_argument('--adata_path_celltype', help='Custom reference data path for celltype')
     parser.add_argument('--auto_preprocess', action='store_true', default=True,
                        help='Automatically preprocess raw count data (default: True)')
     parser.add_argument('--no_preprocess', action='store_true',
@@ -892,16 +791,17 @@ def main():
         auto_preprocess = args.auto_preprocess
     
     try:
-        result = label_transfer_with_preprocessing(
-            query_file=args.query_file,
-            output_folder=args.output_folder,
-            model_type=args.model_type,
-            custom_model_dir=args.model_dir,
-            custom_adata_path=args.adata_path,
-            auto_preprocess=auto_preprocess,
-            clustering_resolution=args.resolution
+        result = label_transfer_with_preprocessing_dual_model(
+           query_file=args.query_file,
+           output_folder=args.output_folder,
+           custom_model_dir_lineage=args.model_dir_lineage,
+           custom_model_dir_celltype=args.model_dir_celltype,
+           custom_adata_path_lineage=args.adata_path_lineage,
+           custom_adata_path_celltype=args.adata_path_celltype,
+           auto_preprocess=auto_preprocess,
+           clustering_resolution=args.resolution
         )
-        
+            
         print("\nTask completed! Result summary:")
         for key, value in result.items():
             print(f"  {key}: {value}")

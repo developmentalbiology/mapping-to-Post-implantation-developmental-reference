@@ -4,13 +4,13 @@
 
 ## 1. Introduction
 
-This tutorial will guide you through using the `label_transfer_integrated.py` script to perform cell type or lineage annotation on your own single-cell RNA sequencing (scRNA-seq) data using pre-trained scPoli models. 
+This tutorial will guide you through using the `label_transfer_integrated.py` script to perform cell type and lineage annotation on your own single-cell RNA sequencing (scRNA-seq) data using pre-trained scPoli models. 
 
 **Key Advantage**: This version **only requires raw count data** and automatically handles all preprocessing steps internally.
 
 ### What You Need:
 - **Input**: Raw count data in `.h5ad` format (just the basic count matrix)
-- **Output**: Fully annotated data with cell type/lineage predictions and visualizations
+- **Output**: Fully annotated data with cell type and lineage predictions and visualizations
 
 By the end of this tutorial, you will be able to:
 
@@ -177,13 +177,12 @@ To quickly test if the script works properly, you can download a pre-processed e
 1. **Access example data link**:
    [https://drive.google.com/file/d/1w1rohJSr4xVm_b0o0b84pB_TUXS44XsS/view?usp=drive_link](https://drive.google.com/file/d/1w1rohJSr4xVm_b0o0b84pB_TUXS44XsS/view?usp=drive_link)
 
-2. **Download and test**: Save the file to your `data` directory and test the script for 'lineage' annotation:
+2. **Download and test**: Save the file to your `data` directory and test the script for 'lineage' and 'cell_type' annotation:
 
    ```bash
    python label_transfer_integrated.py \
        Chen_2025_GSE262081.h5ad \
-       results/test_annotation \
-       --model_type lineage
+       results/test_annotation 
    ```
 
 
@@ -245,40 +244,32 @@ print(f"Max value: {adata.X.max()}")
 
 - **`query_file`** (required): Path to your raw count `.h5ad` file
 - **`output_folder`** (required): Folder to save all results
-- **`--model_type`** (optional): `lineage` or `cell_type` (default: `lineage`)
 - **`--auto_preprocess`** (optional): Enable automatic preprocessing (default: `True`)
 - **`--resolution`** (optional): Clustering resolution for preprocessing (default: `1.0`)
-- **`--model_dir`** (optional): Custom model directory path
+- **`--model_dir_lineage`** (optional): Custom model directory path for lineage
+- **`--model_dir_celltype`** (optional): Custom model directory path for celltype
+- **`--adata_path_lineage`** (optional): Custom reference data path for lineage
+- **`--adata_path_celltype`** (optional): Custom reference data path for celltype
 - **`--no_preprocess`** (optional): Disable preprocessing (only if data is already processed)
 
 ### 4.2. Basic Usage Examples
 
-#### Example 1: lineage annotation with provided dataset
+#### Example 1: annotation with provided dataset
 
 ```bash
 python label_transfer_integrated.py \
     Chen_2025_GSE262081.h5ad \
-    results/lineage_annotation \
-    --model_type lineage    
+    results/annotation  
 ```
 
-#### Example 2: lineage annotation with your own raw data
+#### Example 2: annotation with your own raw data
 
 ```bash
 python label_transfer_integrated.py \
     my_data.h5ad \
-    results/lineage_annotation \
-    --model_type lineage \
+    results/annotation
 ```
 
-#### Example 3: cell type annotation with your own raw data
-
-```bash
-python label_transfer_integrated.py \
-    my_data.h5ad \
-    results/celltype_annotation \
-    --model_type cell_type
-```
 
 ### 4.3. What Happens During Execution
 
@@ -312,8 +303,8 @@ After successful execution, you'll find these files in your output folder:
 - **`*_preprocessed.h5ad`**: Your data after preprocessing (includes all intermediate results)
 - **`*_annotated.h5ad`**: Final annotated data with predictions
 - **`preprocessing_umap_resolution_*.png`**: UMAP plot showing preprocessing clusters
-- **`*_query_*_pred_ordered.pdf`**: UMAP plot with predicted labels
-- **`*_scPoli_*_uncert.png`**: Uncertainty visualization
+- **`*_prediction.pdf`**: UMAP plot with predicted labels
+- **`*_uncertainty.pdf`**: Uncertainty visualization
 
 ### 5.2. Key Data Columns Added
 
@@ -334,8 +325,8 @@ In the final annotated file, you'll find:
 python label_transfer_integrated.py \
     my_data.h5ad \
     results/annotation \
-    --model_dir /path/to/custom/model/ \
-    --model_type lineage
+    --model_dir_lineage /path/to/custom/model/lineage \
+    --model_dir_celltype /path/to/custom/model/celltype
 ```
 
 ### 6.2. Batch Processing
@@ -347,8 +338,7 @@ for file in data/*.h5ad; do
     filename=$(basename "$file" .h5ad)
     python label_transfer_integrated.py \
         "$file" \
-        "results/${filename}_annotation" \
-        --model_type lineage
+        "results/${filename}_annotation" 
 done
 ```
 
@@ -362,7 +352,7 @@ This simplified workflow makes single-cell annotation much easier:
 2. **Download script**: Get `label_transfer_integrated.py` and place in your project directory
 3. **Download models**: Get pre-trained models from the provided Google Drive link
 4. **Prepare raw data**: Just need counts in `.h5ad` format - no preprocessing required!
-5. **Run script**: `python label_transfer_integrated.py data.h5ad results/ --model_type lineage`
+5. **Run script**: `python label_transfer_integrated.py data.h5ad results/ `
 6. **Get results**: Annotated data with cell type predictions and visualizations
 
 ---
