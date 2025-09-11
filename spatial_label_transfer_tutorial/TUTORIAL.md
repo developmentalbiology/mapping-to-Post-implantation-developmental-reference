@@ -20,14 +20,14 @@ This tutorial provides a comprehensive guide on using the spatial annotation wor
 **Option 1: Clone from GitHub (Recommended)**
 ```bash
 git clone https://github.com/developmentalbiology/mapping-to-Post-implantation-developmental-reference.git
-cd mapping-to-Post-implantation-developmental-reference/spatial_label_transfer_tutorial
+cd mapping-to-Post-implantation-developmental-reference
 ```
 
 **Option 2: Download ZIP**
 ```bash
-wget https://github.com/developmentalbiology/mapping-to-Post-implantation-developmental-reference/archive/main.zip
+wget https://github.com/developmentalbiology/mapping-to-Post-implantation-developmental-reference/archive/refs/heads/main.zip
 unzip main.zip
-cd mapping-to-Post-implantation-developmental-reference-main/spatial_label_transfer_tutorial
+cd mapping-to-Post-implantation-developmental-reference-main
 ```
 
 ### Install Dependencies
@@ -46,18 +46,6 @@ To reproduce the published human CS8 embryo analysis results:
 
 ### Step 1: Download Example Data
 
-```bash
-cd data/
-
-# Download human CS8 spatial data
-wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate 'https://docs.google.com/uc?export=download&id=1VoQqgAsqxF3mXwl_HsbbAu64Jp-duXwh' -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=1VoQqgAsqxF3mXwl_HsbbAu64Jp-duXwh" -O cs8_human_embryo.rds
-
-# Download human reference data  
-wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate 'https://docs.google.com/uc?export=download&id=1lhVc_tZCgXcWecW8aV7iINdDz696_r7r' -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=1lhVc_tZCgXcWecW8aV7iINdDz696_r7r" -O human_ref.rds
-
-cd ..
-```
-
 **Manual Download Alternative:**
 - Human CS8 data: [https://drive.google.com/file/d/1VoQqgAsqxF3mXwl_HsbbAu64Jp-duXwh/view?usp=drive_link](https://drive.google.com/file/d/1VoQqgAsqxF3mXwl_HsbbAu64Jp-duXwh/view?usp=drive_link)
 - Human reference: [https://drive.google.com/file/d/1lhVc_tZCgXcWecW8aV7iINdDz696_r7r/view?usp=drive_link](https://drive.google.com/file/d/1lhVc_tZCgXcWecW8aV7iINdDz696_r7r/view?usp=drive_link)
@@ -65,7 +53,7 @@ cd ..
 ### Step 2: Run RCTD Analysis (if needed)
 
 ```bash
-Rscript scripts/utils/run_rctd_with_human_ref.R \
+Rscript ./spatial_label_transfer_tutorial/scripts/utils/run_rctd_with_human_ref.R \
     --spatial data/cs8_human_embryo.rds \
     --reference data/human_ref.rds \
     --output data/rctd_results.rds
@@ -74,7 +62,11 @@ Rscript scripts/utils/run_rctd_with_human_ref.R \
 ### Step 3: Run the Complete Workflow
 
 ```bash
-./examples/human_embryo_example.sh
+chmod +x ./spatial_label_transfer_tutorial/examples/human_embryo_example.sh
+
+./spatial_label_transfer_tutorial/examples/human_embryo_example.sh \
+    --rctd-results /your_path/rctd_results.rds \
+    --spatial-data /your_path/cs8_raw_counts.rds
 ```
 
 This will reproduce the exact results from the original human CS8 analysis using the same parameters and generate identical visualizations.
@@ -96,12 +88,11 @@ This will reproduce the exact results from the original human CS8 analysis using
 
 If your data is in H5AD format (AnnData), you need to convert it to RDS format before running RCTD or this workflow.
 
-#### Method 1: Using Our Conversion Scripts
 
 **Step 1: Export H5AD Data**
 
 ```bash
-python3 scripts/utils/export_h5ad.py \
+python3 ./spatial_label_transfer_tutorial/scripts/utils/export_h5ad.py \
     --input your_reference.h5ad \
     --output exported_data/ \
     --hvg-count 2000
@@ -117,32 +108,12 @@ This script exports:
 **Step 2: Convert to RDS**
 
 ```bash
-Rscript scripts/utils/h5ad_to_rds.R \
+Rscript ./spatial_label_transfer_tutorial/scripts/utils/h5ad_to_rds.R \
     --input exported_data/ \
     --output reference.rds \
     --project "reference_data"
 ```
 
-#### Method 2: Direct Conversion in R
-
-You can also convert H5AD to RDS directly in R using SeuratDisk:
-
-```R
-library(Seurat)
-library(SeuratDisk)
-
-# Install SeuratDisk if not already installed
-# remotes::install_github("mojaveazure/seurat-disk")
-
-# Convert h5ad to h5seurat
-Convert("reference.h5ad", dest = "h5seurat", overwrite = TRUE)
-
-# Load as Seurat object
-reference <- LoadH5Seurat("reference.h5seurat")
-
-# Save as RDS
-saveRDS(reference, "reference.rds")
-```
 
 ### Running RCTD Analysis
 
@@ -155,10 +126,7 @@ We provide a pre-processed human reference dataset optimized for embryonic and d
 **Download the Reference Data**
 
 ```bash
-# Method 1: Using wget (recommended)
-wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate 'https://docs.google.com/uc?export=download&id=1lhVc_tZCgXcWecW8aV7iINdDz696_r7r' -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=1lhVc_tZCgXcWecW8aV7iINdDz696_r7r" -O human_ref.rds && rm -rf /tmp/cookies.txt
-
-# Method 2: Manual download
+# Manual download
 # Visit: https://drive.google.com/file/d/1lhVc_tZCgXcWecW8aV7iINdDz696_r7r/view?usp=drive_link
 # Download and save as human_ref.rds
 ```
@@ -167,7 +135,7 @@ wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download
 
 ```bash
 # Using our provided script
-Rscript scripts/utils/run_rctd_with_human_ref.R \
+Rscript ./spatial_label_transfer_tutorial/scripts/utils/run_rctd_with_human_ref.R \
     --human-ref human_ref.rds \
     --spatial your_spatial_data.rds \
     --output rctd_results.rds \
@@ -207,7 +175,7 @@ spatial_counts <- spatial_data[["RNA"]]$counts
 query <- SpatialRNA(spatial_coords, spatial_counts, colSums(spatial_counts))
 
 # Create and run RCTD
-RCTD <- create.RCTD(query, reference, max_cores = 20)
+RCTD <- create.RCTD(query, reference, max_cores = 20,CELL_MIN_INSTANCE = 3, UMI_min = 0, counts_MIN = 0, UMI_min_sigma = 0)
 RCTD <- run.RCTD(RCTD, doublet_mode = "full")
 
 # Save results
@@ -239,7 +207,7 @@ RCTD produces a weight matrix where each cell (spatial location) has weight scor
 
 ```bash
 # If not already completed
-Rscript scripts/utils/run_rctd_with_human_ref.R \
+Rscript ./spatial_label_transfer_tutorial/scripts/utils/run_rctd_with_human_ref.R \
     --human-ref human_ref.rds \
     --spatial spatial_data.rds \
     --output rctd_results.rds
@@ -251,7 +219,7 @@ Rscript scripts/utils/run_rctd_with_human_ref.R \
 
 ```bash
 # Generate weight score visualizations
-./scripts/run_workflow.sh \
+./spatial_label_transfer_tutorial/scripts/run_workflow.sh \
     --rctd-results rctd_results.rds \
     --spatial-data spatial_data.rds \
     --output-dir weight_analysis/ \
@@ -308,7 +276,7 @@ annotation:
 Run the complete workflow with optimized parameters:
 
 ```bash
-./scripts/run_workflow.sh \
+./spatial_label_transfer_tutorial/scripts/run_workflow.sh \
     --rctd-results rctd_results.rds \
     --spatial-data spatial_data.rds \
     --output-dir final_results/ \
@@ -418,7 +386,7 @@ excluded_cell_types: ["Artifact"]
 Start by generating weight score visualizations without any parameter optimization:
 
 ```bash
-./scripts/run_workflow.sh \
+./spatial_label_transfer_tutorial/scripts/run_workflow.sh \
     --rctd-results rctd_results.rds \
     --spatial-data spatial_data.rds \
     --output-dir initial_analysis/ \
@@ -461,7 +429,7 @@ annotation:
 ### 4. Run First Iteration
 
 ```bash
-./scripts/run_workflow.sh \
+./spatial_label_transfer_tutorial/scripts/run_workflow.sh \
     --rctd-results rctd_results.rds \
     --spatial-data spatial_data.rds \
     --output-dir iteration1/ \
@@ -508,7 +476,7 @@ annotation:
 ### 7. Final Iteration
 
 ```bash
-./scripts/run_workflow.sh \
+./spatial_label_transfer_tutorial/scripts/run_workflow.sh \
     --rctd-results rctd_results.rds \
     --spatial-data spatial_data.rds \
     --output-dir final_results/ \

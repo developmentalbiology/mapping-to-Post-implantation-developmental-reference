@@ -9,21 +9,21 @@ This tutorial provides a complete workflow for refining spatial transcriptomics 
 ### Option 1: Clone from GitHub
 ```bash
 git clone https://github.com/developmentalbiology/mapping-to-Post-implantation-developmental-reference.git
-cd mapping-to-Post-implantation-developmental-reference/spatial_label_transfer_tutorial
+cd mapping-to-Post-implantation-developmental-reference
 ```
 
 ### Option 2: Download ZIP
 ```bash
 # Download and extract the repository
-wget https://github.com/developmentalbiology/mapping-to-Post-implantation-developmental-reference/archive/main.zip
+wget https://github.com/developmentalbiology/mapping-to-Post-implantation-developmental-reference/archive/refs/heads/main.zip
 unzip main.zip
-cd mapping-to-Post-implantation-developmental-reference-main/spatial_label_transfer_tutorial
+cd mapping-to-Post-implantation-developmental-reference-main
 ```
 
 ### Install Dependencies
 ```bash
 # Install R packages
-./install_r_packages.R
+./spatial_label_transfer_tutorial/install_r_packages.R
 
 # Install Python packages (if using H5AD conversion utilities)
 pip install -r requirements.txt
@@ -35,10 +35,10 @@ pip install -r requirements.txt
 
 ```bash
 # 1. Install dependencies
-./install_r_packages.R
+./spatial_label_transfer_tutorial/install_r_packages.R
 
 # 2. Run the workflow
-./scripts/run_workflow.sh \
+./spatial_label_transfer_tutorial/scripts/run_workflow.sh \
     --rctd-results your_rctd_results.rds \
     --spatial-data your_spatial_data.rds \
     --output-dir results/
@@ -90,29 +90,28 @@ spatial_label_transfer_tutorial/
 ├── docs/                        # Additional documentation
 │   ├── TUTORIAL.md              # Detailed methodology guide
 │   └── workflow_diagram_v2.puml # Workflow diagram source
-├── data/                        # Data directory (see data/README.md)
-└── output/                      # Output directory
+└── data/                        # Data directory (see data/README.md)
 ```
 
 ## Usage Examples
 
 ### Basic Usage
 ```bash
-./examples/basic_example.sh
+./spatial_label_transfer_tutorial/examples/basic_example.sh
 ```
 
 ### Human CS8 Embryo Analysis (Reproducible Example)
 ```bash
 # Download example data first:
-# Human CS8 spatial data: https://drive.google.com/file/d/1VoQqgAsqxF3mXwl_HsbbAu64Jp-duXwh/view?usp=drive_link
-# Human reference data: https://drive.google.com/file/d/1lhVc_tZCgXcWecW8aV7iINdDz696_r7r/view?usp=drive_link
+# Human CS8 spatial data: https://drive.google.com/file/d/1VoQqgAsqxF3mXwl_HsbbAu64Jp-duXwh/view?usp=sharing
+# Human reference data: https://drive.google.com/file/d/1lhVc_tZCgXcWecW8aV7iINdDz696_r7r/view?usp=sharing
 
 ./examples/human_embryo_example.sh  # Reproduces human CS8 analysis exactly
 ```
 
 ### Custom Configuration
 ```bash
-./scripts/run_workflow.sh \
+./spatial_label_transfer_tutorial/scripts/run_workflow.sh \
     --rctd-results rctd_results.rds \
     --spatial-data spatial_data.rds \
     --output-dir results/ \

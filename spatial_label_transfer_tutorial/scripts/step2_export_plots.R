@@ -13,9 +13,12 @@
 # Version: 2.1 (Streamlined)
 
 # Set library paths (add this at the very beginning)
-.libPaths(c("/home/liuxiaodongLab/fanxueying/R_LIBS",
-            "/home/liuxiaodongLab/fanxueying/miniconda3/envs/r_env/lib/R/library",
-            "/soft/devtools/R/R-4.4.3_installation/lib64/R/library"))
+.user.lib <- file.path(Sys.getenv("HOME"), "R", "x86_64-pc-linux-gnu-library",
+                       paste(R.version$major, R.version$minor, sep = "."))
+if (file.exists(.user.lib) && !(.user.lib %in% .libPaths())) {
+  .libPaths(c(.user.lib, .libPaths()))
+}
+rm(.user.lib)
 
 # Load required libraries
 suppressPackageStartupMessages({
@@ -60,7 +63,7 @@ generate_weight_plots <- function(rctd_path,
   } else {
     # Default parameters
     params <- list(
-      point_size = 0.5,
+      point_size = 0.1,
       plot_title_size = 14,
       axis_text_size = 10,
       legend_text_size = 8
@@ -129,15 +132,16 @@ generate_weight_plots <- function(rctd_path,
     )
     
     p <- ggplot(plot_data, aes(x = x, y = y, color = weight)) +
-      geom_point(size = 0.1, alpha = 0.8) +  # Small dots like original
-      scale_color_gradientn(colors = c("blue", "yellow", "red"), limits = c(0, 1)) +  # Exact original colors
+      geom_point(size = 0.1) +
+      scale_color_gradientn(colors = c("blue", "yellow", "red"), limits = c(0, 1)) +
       labs(title = title, x = "X", y = "Y") +
       theme_minimal() +
       theme(
         panel.background = element_rect(fill = "black"),
         plot.background = element_rect(fill = "black"),
-        plot.title = element_text(color = "white", size = 36),  # Same large title size as original
-        # Remove grid lines and axis elements like in original script
+        plot.title = element_text(color = "white", size = 36),
+        
+        # Remove grid and axis elements
         axis.title.x = element_blank(),
         axis.title.y = element_blank(), 
         axis.ticks = element_blank(),
@@ -145,7 +149,16 @@ generate_weight_plots <- function(rctd_path,
         axis.text.y = element_blank(),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
-        legend.position = "right"  # Keep legend visible
+        
+        # Legend customization: white background
+        legend.position = "right",
+        legend.background = element_rect(fill = "white", color = "black", size = 0.5),  # 白色填充，可选边框
+        legend.key = element_blank(),  # 可选：移除每个图例项的小背景（保留整体背景）
+        legend.text = element_text(color = "black"),  # 确保文字为黑色，在白色背景上更清晰
+        legend.title = element_text(color = "black"),
+        
+        # Optional: 外框（整个图例盒子外的背景）
+        legend.box.background = element_blank()
       ) +
       coord_fixed()
     

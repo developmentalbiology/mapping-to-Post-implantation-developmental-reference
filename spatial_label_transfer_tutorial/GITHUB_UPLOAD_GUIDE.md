@@ -13,7 +13,7 @@ This guide walks you through uploading the spatial data label transfer tutorial 
 1. Go to [GitHub.com](https://github.com) and sign in
 2. Click the **"+"** icon in top right corner → **"New repository"**
 3. Fill in repository details:
-   - **Repository name**: `spatial_data_label_transfer_tutorial`
+   - **Repository name**: `spatial_label_transfer_tutorial`
    - **Description**: `Advanced spatial annotation using a 5-tier assignment algorithm for spatial transcriptomics data`
    - **Visibility**: Choose Public (recommended for tutorials) or Private
    - **Initialize**: Leave "Add a README file" **unchecked** (we already have one)

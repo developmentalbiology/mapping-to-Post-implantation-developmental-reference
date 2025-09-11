@@ -1,86 +1,45 @@
 #!/usr/bin/env Rscript
 
-# Install R packages required for the spatial annotation workflow
-# 
-# This script installs all the required R packages for the workflow.
-# Run this script before using the workflow for the first time.
+# ========================================================
+# Install all R packages required for spatial annotation analysis
+# Including packages from CRAN and GitHub
+# ========================================================
 
-# Set CRAN mirror
+cat("🚀 Starting installation of R packages required for spatial annotation analysis...\n")
+
+# Set CRAN mirror (recommended to use official or domestic mirror)
 options(repos = c(CRAN = "https://cloud.r-project.org/"))
-
-cat("Installing R packages for Spatial Annotation Workflow...\n")
-
-# List of required packages
-required_packages <- c(
+options(timeout = 300) 
+# List of packages from CRAN
+cran_packages <- c(
   "Seurat",
-  "Matrix", 
   "readr",
-  "data.table",
   "tidyverse",
-  "spacexr",
+  "Matrix",
+  "data.table",
   "doParallel",
-  "parallel",
+  "parallelly",      # Note: you wrote "parallelly", not "parallel" ("parallel" is a base R package)
   "quadprog",
-  "argparse",
-  "yaml",
+  "yaml",            # Note: the CRAN package name for r-yaml is simply "yaml"
   "ggplot2",
   "RColorBrewer",
   "viridis",
-  "patchwork"
+  "patchwork",
+  "remotes"          # Must install "remotes" first to install GitHub packages
 )
 
-# Function to install packages if not already installed
-install_if_missing <- function(packages) {
-  for (pkg in packages) {
-    if (!require(pkg, character.only = TRUE, quietly = TRUE)) {
-      cat("Installing", pkg, "...\n")
-      install.packages(pkg, dependencies = TRUE)
-      
-      # Check if installation was successful
-      if (!require(pkg, character.only = TRUE, quietly = TRUE)) {
-        cat("Failed to install", pkg, "\n")
-      } else {
-        cat("Successfully installed", pkg, "\n")
-      }
-    } else {
-      cat(pkg, "is already installed\n")
-    }
-  }
-}
-
 # Install CRAN packages
-cat("Installing CRAN packages...\n")
-install_if_missing(required_packages)
+cat("📦 Installing CRAN packages...\n")
+install.packages(cran_packages, dependencies = TRUE)
 
-# Install spacexr from GitHub if not available from CRAN
-if (!require("spacexr", character.only = TRUE, quietly = TRUE)) {
-  cat("Installing spacexr from GitHub...\n")
-  if (!require("devtools", character.only = TRUE, quietly = TRUE)) {
-    install.packages("devtools")
-  }
-  devtools::install_github("dmcable/spacexr", build_vignettes = FALSE)
-}
+# Install GitHub packages
+cat("🐙 Installing additional packages from GitHub...\n")
 
-cat("\n=== Installation Summary ===\n")
-cat("Checking all required packages...\n")
+# Install argparse (trevorld/r-argparse)
+remotes::install_github("trevorld/r-argparse")
 
-all_installed <- TRUE
-for (pkg in required_packages) {
-  if (require(pkg, character.only = TRUE, quietly = TRUE)) {
-    cat("✓", pkg, "\n")
-  } else {
-    cat("✗", pkg, "- FAILED\n")
-    all_installed <- FALSE
-  }
-}
+# Install spacexr (dmcable/spacexr)
+remotes::install_github("dmcable/spacexr", build_vignettes = FALSE)
 
-if (all_installed) {
-  cat("\n✓ All packages installed successfully!\n")
-  cat("You can now run the spatial annotation workflow.\n")
-} else {
-  cat("\n✗ Some packages failed to install.\n")
-  cat("Please check the error messages above and install missing packages manually.\n")
-}
-
-cat("\nFor more information, see the README.md file.\n")
-
+cat("\n🎉 All packages have been installed successfully!\n")
+cat("You can now run the spatial annotation analysis workflow.\n")

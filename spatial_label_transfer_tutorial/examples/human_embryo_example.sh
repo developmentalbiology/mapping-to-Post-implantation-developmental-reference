@@ -1,67 +1,147 @@
 #!/bin/bash
 
-# Example: Running Spatial Annotation Workflow for Human CS8 Embryo Data
-# 
-# This script demonstrates how to reproduce the exact results from the 
-# original human CS8 spatial transcriptomics analysis using the provided
-# configuration parameters that match the published research.
+# =============================================================================
+# Human CS8 Embryo Spatial Annotation Workflow (Flexible I/O)
+#
+# Allows full control over input and output paths.
+# No more forcing users into the workflow directory!
+# =============================================================================
 
-set -e
+set -euo pipefail
 
-# Get the directory of this script
+# -------------------------------
+# Default values
+# -------------------------------
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 WORKFLOW_DIR="$(dirname "$SCRIPT_DIR")"
 
-# Human CS8 embryo data paths - modify these paths to point to your actual data
-RCTD_RESULTS="$WORKFLOW_DIR/data/rctd_results.rds"          # Your RCTD results file
-SPATIAL_DATA="$WORKFLOW_DIR/data/spatial_data.rds"          # Your human CS8 spatial data file  
-OUTPUT_DIR="$WORKFLOW_DIR/output/human_CS8_example"
-CONFIG_FILE="$WORKFLOW_DIR/config/human_CS8_spatial.yaml"   # Updated config file name
+# ✅ 默认输出目录：当前目录下的 output/human_CS8_example
+DEFAULT_OUTPUT_DIR="./output/human_CS8_example"
 
+# 其他默认值（可被覆盖）
+DEFAULT_CONFIG_FILE="$WORKFLOW_DIR/config/human_CS8_spatial.yaml"
+RCTD_RESULTS=""
+SPATIAL_DATA=""
+OUTPUT_DIR="$DEFAULT_OUTPUT_DIR"
+CONFIG_FILE="$DEFAULT_CONFIG_FILE"
+SPATIAL_COORDS_X="x"
+SPATIAL_COORDS_Y="y"
+VERBOSE=true
+
+# -------------------------------
+# Help message
+# -------------------------------
+print_help() {
+    cat << 'EOF'
+Usage: human_embryo_example.sh [OPTIONS]
+
+Run spatial annotation with flexible input/output paths.
+You can specify your own data files and output location.
+
+Options:
+    --rctd-results <file>     Path to RCTD results .rds file (required)
+    --spatial-data <file>     Path to spatial data .rds file (required)
+    --output-dir <dir>        Output directory (default: ./output/human_CS8_example)
+    --config <file>           Configuration YAML (default: internal config)
+    --spatial-coords <x> <y>  Column names for spatial coordinates (default: "x" "y")
+    --quiet                   Disable verbose output
+    --help                    Show this help and exit
+
+Example:
+    ./human_embryo_example.sh \
+        --rctd-results ~/data/rctd.rds \
+        --spatial-data ~/data/spatial.rds \
+        --output-dir ./results/cs8_analysis
+EOF
+}
+
+# -------------------------------
+# Parse arguments
+# -------------------------------
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --rctd-results)
+            RCTD_RESULTS="$2"; shift; shift ;;
+        --spatial-data)
+            SPATIAL_DATA="$2"; shift; shift ;;
+        --output-dir)
+            OUTPUT_DIR="$2"; shift; shift ;;
+        --config)
+            CONFIG_FILE="$2"; shift; shift ;;
+        --spatial-coords)
+            SPATIAL_COORDS_X="$2"; SPATIAL_COORDS_Y="$3"; shift; shift; shift ;;
+        --quiet)
+            VERBOSE=false; shift ;;
+        --help|-h)
+            print_help; exit 0 ;;
+        *)
+            echo "Unknown option: $1" >&2; print_help; exit 1 ;;
+    esac
+done
+
+# -------------------------------
+# Validate required inputs
+# -------------------------------
+if [[ -z "$RCTD_RESULTS" ]]; then
+    echo "ERROR: Missing --rctd-results" >&2
+    print_help
+    exit 1
+fi
+
+if [[ -z "$SPATIAL_DATA" ]]; then
+    echo "ERROR: Missing --spatial-data" >&2
+    print_help
+    exit 1
+fi
+
+if [[ ! -f "$RCTD_RESULTS" ]]; then
+    echo "ERROR: RCTD file not found: $RCTD_RESULTS" >&2
+    exit 1
+fi
+
+if [[ ! -f "$SPATIAL_DATA" ]]; then
+    echo "ERROR: Spatial data file not found: $SPATIAL_DATA" >&2
+    exit 1
+fi
+
+if [[ ! -f "$CONFIG_FILE" ]]; then
+    echo "WARNING: Config file not found: $CONFIG_FILE" >&2
+fi
+
+# ✅ 创建输出目录（基于用户指定或默认）
+mkdir -p "$OUTPUT_DIR"
+
+# -------------------------------
+# Run the workflow
+# -------------------------------
 echo "=== Human CS8 Embryo Spatial Annotation Workflow ==="
-echo "This reproduces the exact analysis parameters from the original research"
+echo "Using flexible I/O paths."
 echo ""
-echo "RCTD results: $RCTD_RESULTS"
-echo "Spatial data: $SPATIAL_DATA" 
-echo "Output directory: $OUTPUT_DIR"
-echo "Configuration: $CONFIG_FILE"
+echo "RCTD Results:     $RCTD_RESULTS"
+echo "Spatial Data:     $SPATIAL_DATA"
+echo "Output Directory: $OUTPUT_DIR"
+echo "Config File:      $CONFIG_FILE"
+echo "Spatial Coords:   ($SPATIAL_COORDS_X, $SPATIAL_COORDS_Y)"
 echo ""
 
-# Check if input files exist
-if [ ! -f "$RCTD_RESULTS" ]; then
-    echo "Warning: RCTD results file not found: $RCTD_RESULTS"
-    echo "Please place your human CS8 RCTD results file at this location."
-    echo "See data/README.md for data acquisition instructions."
-    echo ""
+# 检查 run_workflow.sh 是否可执行
+WORKFLOW_SCRIPT="$WORKFLOW_DIR/scripts/run_workflow.sh"
+if [[ ! -x "$WORKFLOW_SCRIPT" ]]; then
+    echo "ERROR: Workflow script not executable: $WORKFLOW_SCRIPT" >&2
+    echo "Run: chmod +x '$WORKFLOW_SCRIPT'" >&2
+    exit 1
 fi
 
-if [ ! -f "$SPATIAL_DATA" ]; then
-    echo "Warning: Spatial data file not found: $SPATIAL_DATA"
-    echo "Please place your human CS8 spatial data file at this location."
-    echo "See data/README.md for data acquisition instructions."
-    echo ""
-fi
-
-# Run the workflow with human CS8 specific parameters
-echo "Running human CS8 embryo spatial annotation workflow..."
-echo "Using exact parameters from the original analysis to reproduce results..."
-"$WORKFLOW_DIR/scripts/run_workflow.sh" \
+echo "Running analysis..."
+"$WORKFLOW_SCRIPT" \
     --rctd-results "$RCTD_RESULTS" \
     --spatial-data "$SPATIAL_DATA" \
     --output-dir "$OUTPUT_DIR" \
     --config "$CONFIG_FILE" \
-    --spatial-coords "x" "y" \
-    --verbose
+    --spatial-coords "$SPATIAL_COORDS_X" "$SPATIAL_COORDS_Y" \
+    ${VERBOSE:+--verbose}
 
 echo ""
-echo "=== Human CS8 Analysis Completed ==="
-echo "Results saved to: $OUTPUT_DIR"
+echo "✅ Analysis completed!"
+echo "Results saved to: $(realpath "$OUTPUT_DIR")"
 echo ""
-echo "Key outputs:"
-echo "  - Final annotations: $OUTPUT_DIR/annotated_spatial.rds"
-echo "  - Final assignment plot: $OUTPUT_DIR/annotated_spatial_final_assignment.pdf"
-echo "  - Assignment results CSV: $OUTPUT_DIR/annotated_spatial_assignment_results.csv"
-echo "  - Cell type weight plots: $OUTPUT_DIR/plots/all_cell_type_weights.pdf"
-echo "  - Weight statistics: $OUTPUT_DIR/plots/weight_statistics.csv"
-echo ""
-echo "The results should match the original human CS8 analysis exactly."

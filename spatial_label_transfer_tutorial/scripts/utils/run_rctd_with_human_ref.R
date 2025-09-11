@@ -73,17 +73,13 @@ run_rctd_with_human_ref <- function(human_ref_path,
     stop("Cell type column '", cell_type_column, "' not found in reference metadata")
   }
   
-  # Set cell type identity
-  human_ref[[cell_type_column]] <- as.character(human_ref[[cell_type_column]])
-  Idents(human_ref) <- cell_type_column
-  
   cat("Human reference dataset loaded:\n")
   cat("  Cells:", ncol(human_ref), "\n")
   cat("  Genes:", nrow(human_ref), "\n")
   cat("  Cell types:", length(unique(Idents(human_ref))), "\n")
   
   # Remove clusters with only one cell
-  cell_counts <- table(Idents(human_ref))
+  cell_counts <- table(human_ref@meta.data[[cell_type_column]])
   valid_clusters <- names(cell_counts[cell_counts > 1])
   
   if (length(valid_clusters) < length(cell_counts)) {
@@ -92,11 +88,11 @@ run_rctd_with_human_ref <- function(human_ref_path,
     human_ref <- subset(human_ref, idents = valid_clusters)
   }
   
-  cat("Final reference cell types:", length(unique(Idents(human_ref))), "\n")
+  cat("Final reference cell types:", length(unique(human_ref@meta.data[[cell_type_column]])), "\n")
   
   # Extract reference information for RCTD
   ref_counts <- human_ref[["RNA"]]$counts
-  ref_cluster <- as.factor(Idents(human_ref))
+  ref_cluster <- as.factor(human_ref@meta.data[[cell_type_column]])
   names(ref_cluster) <- colnames(human_ref)
   ref_nUMI <- human_ref$nCount_RNA
   names(ref_nUMI) <- colnames(human_ref)
@@ -156,7 +152,7 @@ run_rctd_with_human_ref <- function(human_ref_path,
   cat("  Max cores:", max_cores, "\n")
   cat("  Doublet mode:", doublet_mode, "\n")
   
-  RCTD <- create.RCTD(query, reference, max_cores = max_cores)
+  RCTD <- create.RCTD(query, reference, max_cores = max_cores,CELL_MIN_INSTANCE = 3, UMI_min = 0, counts_MIN = 0, UMI_min_sigma = 0)
   
   # Run RCTD analysis
   cat("Running RCTD analysis...\n")

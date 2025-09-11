@@ -25,46 +25,42 @@ suppressPackageStartupMessages({
 # Source the multi-tier assignment function
 # Get script directory - robust method that works with both source() and Rscript
 get_script_dir <- function() {
-  # Try multiple methods to get script directory
-  script_dir <- tryCatch({
-    if (sys.nframe() == 0) {
-      # Running with Rscript - try different approaches
-      args <- commandArgs(trailingOnly = FALSE)
-      file_arg <- grep("--file=", args, value = TRUE)
-      if (length(file_arg) > 0) {
-        script_path <- sub("--file=", "", file_arg)
-        dirname(normalizePath(script_path))
-      } else {
-        # Alternative method
-        dirname(normalizePath(sys.frame(1)$ofile))
-      }
-    } else {
-      # Being sourced
-      dirname(sys.frame(1)$ofile)
-    }
-  }, error = function(e) {
-    # If all methods fail, assume we're in the scripts directory or main directory
-    current_dir <- getwd()
-    if (file.exists(file.path(current_dir, "multi_tier_integrated_final.R"))) {
-      return(current_dir)
-    } else if (file.exists(file.path(current_dir, "scripts", "multi_tier_integrated_final.R"))) {
-      return(file.path(current_dir, "scripts"))
-    } else {
-      return(current_dir)
-    }
-  })
-  
-  # Ensure we have a valid directory and the target file exists
-  if (is.na(script_dir) || is.null(script_dir) || script_dir == "") {
-    current_dir <- getwd()
-    if (file.exists(file.path(current_dir, "scripts", "multi_tier_integrated_final.R"))) {
-      script_dir <- file.path(current_dir, "scripts")
-    } else {
-      script_dir <- current_dir
+  # 方法 1: 尝试从 commandArgs 获取脚本路径（Rscript 模式）
+  args <- commandArgs(trailingOnly = FALSE)
+  file_arg <- grep("--file=", args, value = TRUE)
+  if (length(file_arg) > 0) {
+    script_path <- sub("--file=", "", file_arg)
+    if (file.exists(script_path)) {
+      return(dirname(normalizePath(script_path)))
     }
   }
-  
-  return(script_dir)
+
+  # 方法 2: 使用 sys.frame（适用于 sourced 或某些 Rscript 场景）
+  if (exists("sys.frames") && sys.nframe() > 0) {
+    ofile <- sys.frame(1)$ofile
+    if (!is.null(ofile) && file.exists(ofile)) {
+      return(dirname(normalizePath(ofile)))
+    }
+  }
+
+  # 方法 3: 查找当前目录下的 multi_tier_integrated_final.R
+  current_dir <- getwd()
+  candidate_paths <- c(
+    file.path(current_dir, "multi_tier_integrated_final.R"),
+    file.path(current_dir, "scripts", "multi_tier_integrated_final.R"),
+    file.path(dirname(current_dir), "spatial_label_transfer_tutorial", "scripts", "multi_tier_integrated_final.R")
+  )
+
+  for (path in candidate_paths) {
+    if (file.exists(path)) {
+      cat("Warning: Using fallback path for multi_tier_integrated_final.R:\n  ", path, "\n", sep = "")
+      return(dirname(path))
+    }
+  }
+
+  # 方法 4: 如果都失败，返回当前目录（最后手段）
+  warning("Could not determine script directory; using getwd().")
+  return(current_dir)
 }
 
 script_dir <- get_script_dir()
